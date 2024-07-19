@@ -3,7 +3,7 @@ import express, { Express, Request, Response } from 'express';
 
 dotenv.config();
 
-const app: Express = express();
+const app: Express = expre();
 const port = process.env.PORT ?? 8081;
 
 app.get('/', (req: Request, res: Response) => {

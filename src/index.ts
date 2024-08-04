@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import express, { Express, Request, Response } from 'express';
 import fileUpload from 'express-fileupload';
 import mongoose from 'mongoose';
+import userRouter from '../routes/user.route';
 
 dotenv.config();
 
@@ -25,6 +26,8 @@ const URL = process.env.MONGODB_URI;
 app.get('/', (req: Request, res: Response) => {
   res.json({ message: 'Hello World!' });
 });
+
+app.use('/api/auth', userRouter);
 
 app.listen(port, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${port}`);

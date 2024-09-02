@@ -6,6 +6,8 @@ const blogRouter: Router = express.Router();
 
 blogRouter.get('/', blogController.getBlogs);
 blogRouter.get('/:id', blogController.getBlog);
+blogRouter.get('/user/:id', blogController.getBlogByUser);
+blogRouter.get('/category/:category', blogController.getBlogByCategory);
 blogRouter.post('/', authUser, blogController.createBlog);
 blogRouter.put('/:id', authUser, blogController.updateBlog);
 blogRouter.delete('/:id', authUser, blogController.deleteBlog);

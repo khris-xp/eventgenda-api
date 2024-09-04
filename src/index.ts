@@ -6,6 +6,7 @@ import fileUpload from 'express-fileupload';
 import mongoose from 'mongoose';
 import blogRouter from '../routes/blog.route';
 import userRouter from '../routes/user.route';
+import locationRouter from '../routes/location.route';
 
 dotenv.config();
 
@@ -30,6 +31,7 @@ app.get('/', (req: Request, res: Response) => {
 
 app.use('/api/auth', userRouter);
 app.use('/api/blogs', blogRouter);
+app.use('/api/location', locationRouter);
 
 app.listen(port, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${port}`);

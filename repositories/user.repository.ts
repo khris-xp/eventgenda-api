@@ -1,6 +1,6 @@
 import { default as User } from '../models/user.model';
 
-class UserRerpository {
+class UserRepository {
   async findById(userId: string) {
     if (!userId) throw new Error('User does not exist.');
     const user = await User.findById(userId).select('-password');
@@ -9,4 +9,4 @@ class UserRerpository {
   }
 }
 
-export default new UserRerpository();
+export default new UserRepository();

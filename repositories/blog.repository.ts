@@ -7,7 +7,7 @@ class BlogRepository extends BaseRepository<BlogDocument> {
   constructor() {
     super(blogModel);
   }
-
+  
   async getAllBlogs(): Promise<BlogDocument[]> {
     return await this.model.find().exec();
   }

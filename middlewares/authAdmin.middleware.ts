@@ -16,7 +16,7 @@ const authAdmin = async (
       return res.status(401).json({ msg: 'Unauthorized' });
     }
 
-    const userId = req.user?._id;
+    const userId = req.user._id;
 
     if (!userId) {
       return res.status(400).json({ message: 'User does not exist.' });
@@ -28,10 +28,12 @@ const authAdmin = async (
       return res.status(401).json({ msg: 'User not found' });
     }
 
-    if (user.role !== 'admin') {
-      return res.status(401).json({ msg: 'Unauthorized' });
+    // Check if the role array includes 'admin'
+    if (!user.role.includes('admin')) {
+      return res.status(403).json({ msg: 'Access denied. Admin role required.' });
     }
 
+    // If we reach here, the user is an admin
     next();
   } catch (err) {
     const error = err as Error;

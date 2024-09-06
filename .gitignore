@@ -41,6 +41,6 @@ dist/**/*
 yarn.lock
 
 # husky
-.husky
+.husky/
 
 .venv/

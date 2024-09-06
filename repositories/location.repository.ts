@@ -4,6 +4,7 @@ import { CreateLocationDto, UpdateLocationDto } from '../common/dto/location.dto
 
 class LocationRepository {
   async getAllLocations(): Promise<LocationDocument[]> {
+
     return await Location.find().exec();
   }
 

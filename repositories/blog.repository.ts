@@ -51,7 +51,6 @@ class BlogRepository extends BaseRepository<BlogDocument> {
 
   async deleteBlog(id: string): Promise<void> {
     await this.model.findByIdAndDelete(id).exec();
-  }
-}
-
+  
+}};
 export default new BlogRepository();

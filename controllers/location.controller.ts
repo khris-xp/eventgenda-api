@@ -55,7 +55,7 @@ const locationController = {
     try {
       const { name, location, prices, thumbnail } = request.body as CreateLocationDto;
       
-      const locationExist = await locationRepository.getLocationByName(name);
+      const locationExist = await locationRepository.checkLocationExist(name);
       if (locationExist) {
         return errorResponseStatus(
           400,

@@ -39,11 +39,6 @@ class LocationRepository {
   async deleteLocation(id: string): Promise<void> {
     await Location.findByIdAndDelete(id).exec();
   }
-
-  async checkLocationExist(name: string): Promise<boolean> {
-    const location = await Location.findOne({ name: name }).exec();
-    return location !== null;
-  }
 }
 
 export default new LocationRepository();

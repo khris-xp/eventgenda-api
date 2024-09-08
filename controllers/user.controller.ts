@@ -23,7 +23,7 @@ const authController = {
       const { fullName, userName, email, password, age } =
         request.body as RegisterUserDto;
 
-      const user = await User.findOne({ email });
+        const user = await User.findOne({ email });
 
       if (user) {
         return response.status(400).json({ message: 'Email already exists.' });
@@ -58,7 +58,7 @@ const authController = {
       const { email, password } = request.body as LoginUserDto;
 
       const user = await User.findOne({ email });
-
+      
       if (!user) {
         return response.status(400).json({ message: 'User does not exist.' });
       }

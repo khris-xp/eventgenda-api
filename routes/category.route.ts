@@ -12,9 +12,9 @@ categoryRouter.get('/categories/name/:name', CategoryController.getCategoryByNam
 
 categoryRouter.post('/categories', authAdmin ,CategoryController.createCategory);
 
-categoryRouter.put('/categories/:id', authAdmin,CategoryController.updateCategory);
+categoryRouter.put('/categories/:id', authAdmin, CategoryController.updateCategory);
 
-categoryRouter.delete('/categories/:id', authAdmin,CategoryController.deleteCategory);
+categoryRouter.delete('/categories/:id',CategoryController.deleteCategory);
 
 export default categoryRouter;
 

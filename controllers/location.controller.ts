@@ -2,10 +2,7 @@ import { Request, Response } from 'express';
 import { handleError } from '../utils/error.utils';
 import { errorResponseStatus, successResponseStatus } from '../utils/response.utils';
 import locationRepository from '../repositories/location.repository';
-import {
-  CreateLocationDto,
-  UpdateLocationDto,
-} from '../common/dto/location.dto';
+import { CreateLocationDto, UpdateLocationDto } from '../common/dto/location.dto';
 
 const locationController = {
   getLocations: async (request: Request, response: Response) => {

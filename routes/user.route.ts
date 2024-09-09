@@ -1,7 +1,7 @@
 import express, { Router } from 'express';
 import userController from '../controllers/user.controller';
 import authUser from '../middlewares/auth.middleware';
-import authAdmin from '../middlewares/authAdmin.middleware';
+//import authAdmin from '../middlewares/authAdmin.middleware';
 const userRouter: Router = express.Router();
 
 userRouter.post('/register', userController.register);

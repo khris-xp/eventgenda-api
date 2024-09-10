@@ -52,21 +52,21 @@ const locationController = {
     try {
       const { name, location, prices, thumbnail } = request.body as CreateLocationDto;
       
-      const locationExist = await locationRepository.checkLocationExist(name);
-      if (locationExist) {
-        return errorResponseStatus(
-          400,
-          response,
-          'Location already exists.',
-          null
-        );
-      }
-
       if (!name || !location || !prices || !thumbnail) {
         return errorResponseStatus(
           400,
           response,
           'Please fill all the fields.',
+          null
+        );
+      }
+
+      const locationExist = await locationRepository.getLocationByName(name);
+      if (locationExist) {
+        return errorResponseStatus(
+          400,
+          response,
+          'Location already exists.',
           null
         );
       }

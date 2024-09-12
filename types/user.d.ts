@@ -2,7 +2,7 @@ import { Document, Types } from 'mongoose';
 
 export type UserType = {
   _id: mongoose.Schema.Types.ObjectId;
-  email: string;
+  email: string; 
   password: string;
   fullName: string;
   userName: string;
@@ -11,6 +11,7 @@ export type UserType = {
   reward: number;
   role: string[];
   profileImage: string;
+  organization: Types.ObjectId;
   history: Types.ObjectId[];
   createdAt: Date;
   updatedAt: Date;

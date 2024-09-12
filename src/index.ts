@@ -10,6 +10,7 @@ import locationRouter from '../routes/location.route';
 import categoryRouter from '../routes/category.route'
 import historyRouter from '../routes/history.route';
 import sponsorRouter from '../routes/sponsor.route';
+import organizationRouter from '../routes/organization.route';
 
 dotenv.config();
 
@@ -38,7 +39,7 @@ app.use('/api/location', locationRouter);
 app.use('/api/category', categoryRouter);
 app.use('/api/history', historyRouter);
 app.use('/api/sponsor', sponsorRouter);
-
+app.use('/api/org', organizationRouter);
 
 app.listen(port, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${port}`);

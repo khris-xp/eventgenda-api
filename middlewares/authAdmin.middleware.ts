@@ -16,7 +16,7 @@ const authAdmin = async (
       return res.status(401).json({ msg: 'Unauthorized' });
     }
 
-    const userId = req.user?._id;
+    const userId = req.user._id;
 
     if (!userId) {
       return res.status(400).json({ message: 'User does not exist.' });
@@ -32,6 +32,7 @@ const authAdmin = async (
       return res.status(401).json({ msg: 'Unauthorized' });
     }
 
+    // If we reach here, the user is an admin
     next();
   } catch (err) {
     const error = err as Error;

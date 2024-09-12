@@ -15,7 +15,7 @@ import organizationRouter from '../routes/organization.route';
 dotenv.config();
 
 const app: Express = express();
-
+// Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
@@ -29,10 +29,11 @@ app.use(
 const port = process.env.PORT || 8081;
 const URL = process.env.MONGODB_URI;
 
+// Connect to mongodb
 app.get('/', (req: Request, res: Response) => {
-  res.json({ message: 'Hello World!' });
+  res.json({ message: 'Eventgenda is running!' });
 });
-
+// Routes
 app.use('/api/auth', userRouter);
 app.use('/api/blogs', blogRouter);
 app.use('/api/location', locationRouter);

@@ -28,7 +28,7 @@ const authAdmin = async (
       return res.status(401).json({ msg: 'User not found' });
     }
 
-    if (!user.role.includes('admin')) {
+    if (!user.role.includes('Admin')) {
       return res.status(401).json({ msg: 'Unauthorized' });
     }
 

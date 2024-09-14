@@ -5,12 +5,13 @@ import express, { Express, Request, Response } from 'express';
 import fileUpload from 'express-fileupload';
 import mongoose from 'mongoose';
 import blogRouter from '../routes/blog.route';
-import userRouter from '../routes/user.route';
-import locationRouter from '../routes/location.route';
-import categoryRouter from '../routes/category.route'
+import categoryRouter from '../routes/category.route';
+import eventRouter from '../routes/event.route';
 import historyRouter from '../routes/history.route';
-import sponsorRouter from '../routes/sponsor.route';
+import locationRouter from '../routes/location.route';
 import organizationRouter from '../routes/organization.route';
+import sponsorRouter from '../routes/sponsor.route';
+import userRouter from '../routes/user.route';
 
 dotenv.config();
 
@@ -36,6 +37,7 @@ app.get('/', (req: Request, res: Response) => {
 // Routes
 app.use('/api/auth', userRouter);
 app.use('/api/blogs', blogRouter);
+app.use('/api/events', eventRouter);
 app.use('/api/location', locationRouter);
 app.use('/api/category', categoryRouter);
 app.use('/api/history', historyRouter);

@@ -1,5 +1,5 @@
 //  defines API endpoints and links them to controller methods
-import express, {Router} from 'express';
+import express, { Router } from 'express';
 import eventRuleController from '../controllers/eventRule.controller';
 import authUser from '../middlewares/auth.middleware';
 import authAdmin from '../middlewares/authAdmin.middleware';

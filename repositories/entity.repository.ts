@@ -3,11 +3,11 @@ import { CreateEntityDto, UpdateEntityDto } from '../common/dto/entity.dto';
 
 class BaseRepository<T extends Document> {
   protected model: Model<T>;
-//auto generate id every time the model has been called
+
   constructor(model: Model<T>) {
     this.model = model;
   }
-  
+
   async getAll() {
     return await this.model.find();
   }

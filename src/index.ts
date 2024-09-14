@@ -5,10 +5,12 @@ import express, { Express, Request, Response } from 'express';
 import fileUpload from 'express-fileupload';
 import mongoose from 'mongoose';
 import blogRouter from '../routes/blog.route';
-import userRouter from '../routes/user.route';
+import categoryRouter from '../routes/category.route';
+import eventRouter from '../routes/event.route';
+import historyRouter from '../routes/history.route';
 import locationRouter from '../routes/location.route';
 import uploadRouter from '../routes/upload.route';
-
+import userRouter from '../routes/user.route';
 dotenv.config();
 
 const app: Express = express();
@@ -34,6 +36,7 @@ app.get('/', (req: Request, res: Response) => {
 // Routes
 app.use('/api/auth', userRouter);
 app.use('/api/blogs', blogRouter);
+app.use('/api/events', eventRouter);
 app.use('/api/location', locationRouter);
 app.use('/api/uploads', uploadRouter);
 

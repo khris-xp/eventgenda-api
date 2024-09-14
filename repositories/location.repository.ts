@@ -3,12 +3,11 @@ import { LocationDocument } from '../types/location';
 import { CreateLocationDto, UpdateLocationDto } from '../common/dto/location.dto';
 
 class LocationRepository {
-  async getAllLocations(): Promise<LocationDocument[]> {
-
+  async getAll(): Promise<LocationDocument[]> {
     return await Location.find().exec();
   }
 
-  async getLocationById(id: string): Promise<LocationDocument> {
+  async getById(id: string): Promise<LocationDocument> {
     const result = await Location.findById(id).exec();
     if (result === null) {
         throw new Error('Location not found');
@@ -16,7 +15,7 @@ class LocationRepository {
     return result;
   }
 
-  async getLocationByName(name: string): Promise<LocationDocument> {
+  async getByName(name: string): Promise<LocationDocument> {
     const result = await Location.findOne({ name: name }).exec();
     if (result === null) {
         throw new Error('Location not found');
@@ -24,12 +23,12 @@ class LocationRepository {
     return result;
   }
 
-  async createLocation(create: CreateLocationDto): Promise<LocationDocument> {
+  async create(create: CreateLocationDto): Promise<LocationDocument> {
     const newLocation = new Location(create);
     return await newLocation.save();
   }
 
-  async updateLocation(id: string, updates: UpdateLocationDto) {
+  async update(id: string, updates: UpdateLocationDto) {
     const location = await Location.findByIdAndUpdate(id, updates, { new: true }).exec();
     if (location === null) {
         throw new Error('Update location failed');
@@ -37,7 +36,7 @@ class LocationRepository {
     return location;
   }
 
-  async deleteLocation(id: string): Promise<void> {
+  async delete(id: string): Promise<void> {
     await Location.findByIdAndDelete(id).exec();
   }
 }

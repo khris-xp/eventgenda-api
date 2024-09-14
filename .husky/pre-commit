@@ -1,0 +1,4 @@
+
+npm run build || (echo "⛔ Build Failed" && exit 1)
+
+echo "✅ Format, Lint, Build Passed"

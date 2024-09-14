@@ -9,10 +9,8 @@ import categoryRouter from '../routes/category.route';
 import eventRouter from '../routes/event.route';
 import historyRouter from '../routes/history.route';
 import locationRouter from '../routes/location.route';
-import organizationRouter from '../routes/organization.route';
-import sponsorRouter from '../routes/sponsor.route';
+import uploadRouter from '../routes/upload.route';
 import userRouter from '../routes/user.route';
-
 dotenv.config();
 
 const app: Express = express();
@@ -24,6 +22,7 @@ app.use(cors());
 app.use(
   fileUpload({
     useTempFiles: true,
+    tempFileDir: '/tmp/'
   })
 );
 
@@ -39,10 +38,7 @@ app.use('/api/auth', userRouter);
 app.use('/api/blogs', blogRouter);
 app.use('/api/events', eventRouter);
 app.use('/api/location', locationRouter);
-app.use('/api/category', categoryRouter);
-app.use('/api/history', historyRouter);
-app.use('/api/sponsor', sponsorRouter);
-app.use('/api/org', organizationRouter);
+app.use('/api/uploads', uploadRouter);
 
 app.listen(port, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${port}`);

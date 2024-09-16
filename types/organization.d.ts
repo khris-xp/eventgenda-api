@@ -1,4 +1,5 @@
 import mongoose, { Document, Types } from 'mongoose';
+import { EventType } from './event';
 
 export type OrganizationType = {
   _id: mongoose.Schema.Types.ObjectId;
@@ -8,7 +9,7 @@ export type OrganizationType = {
   funding: number;
   coin: number;
   credit: number;
-  createdEvents: Types.ObjectId[];
+  createdEvents: EventType[];
   createdAt: Date;
   updatedAt: Date;
 };

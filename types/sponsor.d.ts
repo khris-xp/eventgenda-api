@@ -4,7 +4,8 @@ export type SponsorType = {
   _id: mongoose.Schema.Types.ObjectId;
   user: Types.ObjectId;
   event: Types.ObjectId;
-  funding: number;
+  amount: number;
+  type: string;
   createdAt: Date;
   updatedAt: Date;
 };

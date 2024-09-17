@@ -15,8 +15,8 @@ class LocationRepository {
     return result;
   }
 
-  async getByName(name: string): Promise<LocationDocument> {
-    const result = await Location.findOne({ name: name }).exec();
+  async getByName(name: string): Promise<LocationDocument[]> {
+    const result = await Location.find({ name: name }).exec();
     if (result === null) {
         throw new Error('Location not found');
     }

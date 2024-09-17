@@ -28,7 +28,7 @@ const authOrganizer = async (
       return res.status(401).json({ msg: 'User not found' });
     }
 
-    if (!user.role.includes('Organizer')) {
+    if (user.role !== 'organizer') {
       return res.status(401).json({ msg: 'Unauthorized' });
     }
 

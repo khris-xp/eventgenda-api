@@ -12,9 +12,9 @@ const userSchema = new Schema<UserType>({
   coin: { type: Number, default: 0 },
   reward: { type: Number, default: 0 },
   role: {
-    type: [String],
-    default: ['User'],
-    enum: ['User', 'Admin', 'Organizer']
+    type: String,
+    default: 'user',
+    enum: ['user', 'admin', 'organizer']
   },
   profileImage: { type: String, default: 'https://shorturl.at/CQtT2' },
   organization: { type: Schema.Types.ObjectId, ref: 'Organization' },

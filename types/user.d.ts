@@ -1,4 +1,6 @@
 import { Document, Types } from 'mongoose';
+import { OrganizationType } from './organization';
+import { HistoryType } from './history';
 
 export type UserType = {
   _id: mongoose.Schema.Types.ObjectId;
@@ -9,10 +11,10 @@ export type UserType = {
   age: number;
   coin: number;
   reward: number;
-  role: string[];
+  role: 'user' | 'admin' | 'organizer';
   profileImage: string;
-  organization: Types.ObjectId;
-  history: Types.ObjectId[];
+  organization: OrganizationType;
+  history: HistoryType[];
   createdAt: Date;
   updatedAt: Date;
 };

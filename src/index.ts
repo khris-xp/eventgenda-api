@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import express, { Express, Request, Response } from 'express';
 import fileUpload from 'express-fileupload';
+import projectRouter from '../routes/project.routes';
 import mongoose from 'mongoose';
 import blogRouter from '../routes/blog.route';
 import categoryRouter from '../routes/category.route';
@@ -13,7 +14,12 @@ import uploadRouter from '../routes/upload.route';
 import userRouter from '../routes/user.route';
 dotenv.config();
 
+
+
 const app: Express = express();
+
+const port = process.env.PORT ?? 8081;
+const URL = process.env.MONGODB_URI;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -26,8 +32,6 @@ app.use(
   })
 );
 
-const port = process.env.PORT || 8081;
-const URL = process.env.MONGODB_URI;
 
 app.get('/', (req: Request, res: Response) => {
   res.json({ message: 'Eventgenda is running!' });
@@ -38,9 +42,11 @@ app.use('/api/blogs', blogRouter);
 app.use('/api/events', eventRouter);
 app.use('/api/location', locationRouter);
 app.use('/api/uploads', uploadRouter);
+app.use('/api/project', projectRouter);
 
 app.listen(port, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
+  console.log(`[server]: Server is running at http://localhost:${port}`);
 });
 
 mongoose

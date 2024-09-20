@@ -1,12 +1,6 @@
 import { default as Sponsor } from '../models/sponsor.model';
 import { SponsorDocument } from '../types/sponsor';
-import { CreateSponsorDto } from '../common/dto/sponsor.dto';
-import userRepository from '../repositories/user.repository';
-
-// ------------- awaiting for the event repository -------------
-import mongoose from 'mongoose';
-const mockEventId = new mongoose.Types.ObjectId("66e00acbc81b82f9f4b736a7");
-// -------------------------------------------------------------
+import { CreateSponsorDto, UpdateSponsorDto } from '../common/dto/sponsor.dto';
 
 class SponsorRepository {
   async getAll(): Promise<SponsorDocument[]> {
@@ -21,84 +15,30 @@ class SponsorRepository {
     return result;
   }
 
-  async getByUser(userId: string): Promise<SponsorDocument[]> {
-    const user = await userRepository.findById(userId);
-    if (!user) {
-      throw new Error('User not found');
-    }
-    
-    const result = await Sponsor.find({ user }).select('-user').exec();
-    if (!result) {
-      throw new Error('Sponsor not found');
-    }
-    return result;
+  async getByUserId(userId: string): Promise<SponsorDocument[]> {
+    return await Sponsor.find({ user: userId }).exec();
   }
 
-  async getByEvent(eventId: string): Promise<SponsorDocument[]> {
-    // ------------- awaiting for the event repository -------------
-    // const event = await eventRepository.getEventById(eventId);
-    // if (!event) {
-    //   throw new Error('Event not found');
-    // }
-    // -------------------------------------------------------------
-    const result = await Sponsor.find({ event: mockEventId }).select('-event').exec();
-    if (!result) {
-      throw new Error('Sponsor not found');
-    }
-    return result;
+  async getByEventId(id: string): Promise<SponsorDocument[]> {
+    return await Sponsor.find({ event: id }).exec();
   }
 
-  async getByEventAndUser(userId: string, eventId: string): Promise<SponsorDocument> {
-    const user = await userRepository.findById(userId);
-    if (!user) {
-      throw new Error('User not found');
-    }
-
-    // ------------- awaiting for the event repository -------------
-    // const event = await eventRepository.getEventById(eventId);
-    // if (!event) {
-    //   throw new Error('Event not found');
-    // }
-    // -------------------------------------------------------------
-
-    const result = await Sponsor.findOne({ event: mockEventId, user}).exec();
-    if (!result) {
-      throw new Error('Sponsor not found');
-    }
-    return result
+  async create(create: CreateSponsorDto): Promise<SponsorDocument> {
+    const newSponsor = new Sponsor(create);
+    return await newSponsor.save();
   }
 
-  async create(userId: string, create: CreateSponsorDto): Promise<SponsorDocument> {
-    const user = await userRepository.findById(userId);
-    if (!user) {
-      throw new Error('User not found');
+  async update(id: string, updates: UpdateSponsorDto): Promise<SponsorDocument> {
+    const sponsor = await Sponsor.findByIdAndUpdate(id, updates, { new: true }).exec();
+    if (!sponsor) {
+      throw new Error('Update sponsor failed');
     }
 
-    if (!user.role.includes("User")) {
-      throw new Error('Only user can fund the event');
-    }
+    return sponsor;
+  }
 
-    if (user.coin < create.funding) {
-      throw new Error('Not enough coin');
-    }
-    
-    user.coin -= create.funding;
-    await user.save();
-
-    // ------------- awaiting for the event repository -------------
-    // const event = await eventRepository.getEventById(create.eventId);
-    // if (!event) {
-    //   throw new Error('Event not found');
-    // }
-    // -------------------------------------------------------------
-
-    const sponsor = new Sponsor({
-      user: user._id,
-      event: mockEventId, // awaiting for the event repository
-      funding: create.funding,
-    });
-
-    return await sponsor.save();
+  async delete(id: string): Promise<void> {
+    await Sponsor.findByIdAndDelete(id).exec();
   }
 }
 

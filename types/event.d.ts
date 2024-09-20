@@ -23,6 +23,7 @@ export type EventType = {
   thumbnail: string;
   location: LocationType;
   amountRaised: number;
+  amountRequired: number;
   status: 'pending' | 'open' | 'closed';
   createdAt: Date;
   updatedAt: Date;

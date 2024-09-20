@@ -20,7 +20,8 @@ const eventSchema = new Schema<EventType>(
     prizes: [{ type: Number }],
     thumbnail: { type: String, default: 'https://shorturl.at/nzKic' },
     location: { type: Schema.Types.ObjectId, ref: 'Location' },
-    amountRaised: { type: Number, required: true },
+    amountRaised: { type: Number, default: 0 },
+    amountRequired: { type: Number, required: true },
     status: { 
       type: String, 
       default: 'pending', 

@@ -6,7 +6,6 @@ import {
 } from '../utils/response.utils';
 import sponsorRepository from '../repositories/sponsor.repository';
 import { CreateSponsorDto, UpdateSponsorDto } from '../common/dto/sponsor.dto';
-import userRepository from '../repositories/user.repository';
 
 const sponsorController = {
   getSponsors: async (request: Request, response: Response) => {

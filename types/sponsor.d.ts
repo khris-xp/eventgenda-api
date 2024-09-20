@@ -1,11 +1,13 @@
 import { Document, Types } from 'mongoose';
+import { UserType } from './user';
+import { EventType } from './event';
 
 export type SponsorType = {
   _id: mongoose.Schema.Types.ObjectId;
-  user: Types.ObjectId;
-  event: Types.ObjectId;
+  user: UserType;
+  event: EventType;
   amount: number;
-  type: string;
+  type: 'funding' | 'donation';
   createdAt: Date;
   updatedAt: Date;
 };

@@ -1,8 +1,11 @@
 import { Request, Response } from 'express';
 import { handleError } from '../utils/error.utils';
-import { errorResponseStatus, successResponseStatus } from '../utils/response.utils';
+import {
+  errorResponseStatus,
+  successResponseStatus,
+} from '../utils/response.utils';
 import sponsorRepository from '../repositories/sponsor.repository';
-import { CreateSponsorDto } from '../common/dto/sponsor.dto';
+import { CreateSponsorDto, UpdateSponsorDto } from '../common/dto/sponsor.dto';
 
 const sponsorController = {
   getSponsors: async (request: Request, response: Response) => {
@@ -33,8 +36,7 @@ const sponsorController = {
 
   getSponsorByUser: async (request: Request, response: Response) => {
     try {
-      // const userId = request.user?._id;
-      const sponsors = await sponsorRepository.getByUser(request.params.id);
+      const sponsors = await sponsorRepository.getByUserId(request.params.id);
       return successResponseStatus(
         response,
         'Get sponsor by user successfully.',
@@ -47,7 +49,7 @@ const sponsorController = {
 
   getSponsorByEvent: async (request: Request, response: Response) => {
     try {
-      const sponsors = await sponsorRepository.getByEvent(request.params.id);
+      const sponsors = await sponsorRepository.getByEventId(request.params.id);
       return successResponseStatus(
         response,
         'Get sponsor by event successfully.',
@@ -61,21 +63,50 @@ const sponsorController = {
   createSponsor: async (request: Request, response: Response) => {
     try {
       const userId = request.user?._id;
-      if (!userId) return errorResponseStatus(400, response, 'User does not exist.', null);
+      const sponsor = await sponsorRepository.create({
+        user: userId,
+        ...request.body,
+      } as CreateSponsorDto);
 
-      const { eventId, funding } = request.body as CreateSponsorDto;
-      if (!eventId || !funding) return errorResponseStatus(400, response, 'Please fill all the fields.', null);
-
-      const newSponsor = await sponsorRepository.create(userId, { eventId, funding });
       return successResponseStatus(
         response,
         'Create sponsor successfully.',
-        newSponsor
+        sponsor
       );
     } catch (error) {
       handleError(response, error);
     }
-  }
+  },
+
+  updateSponsor: async (request: Request, response: Response) => {
+    try {
+      const userId = request.user?._id;
+      const sponsor = await sponsorRepository.update(request.params.id, {
+        user: userId,
+        ...request.body,
+      } as UpdateSponsorDto);
+      return successResponseStatus(
+        response,
+        'Update sponsor successfully.',
+        sponsor
+      );
+    } catch (error) {
+      handleError(response, error);
+    }
+  },
+
+  deleteSponsor: async (request: Request, response: Response) => {
+    try {
+      await sponsorRepository.delete(request.params.id);
+      return successResponseStatus(
+        response,
+        'Delete sponsor successfully.',
+        null
+      );
+    } catch (error) {
+      handleError(response, error);
+    }
+  },
 };
 
 export default sponsorController;

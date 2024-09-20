@@ -55,6 +55,10 @@ class EventRepository extends BaseRepository<EventDocument> {
   async deleteEvent(id: string): Promise<void> {
     await this.model.findByIdAndDelete(id).exec();
   }
+
+  async updateEventOne(id: string, updates: Partial<CreateEventDto>): Promise<void> {
+    await this.model.findById(id).updateOne(updates).exec();
+  }
 }
 
 export default new EventRepository();

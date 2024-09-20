@@ -1,3 +1,4 @@
+import { UpdateUserDto } from '../common/dto/user.dto';
 import { default as User } from '../models/user.model';
 
 class UserRepository {
@@ -14,6 +15,10 @@ class UserRepository {
     if (!user) throw new Error('User does not exist.');
     if (user.role !== 'organizer') throw new Error('User is not an organizer.');
     return user;
+  }
+
+  async updateOne(id: string, updates: Partial<UpdateUserDto>): Promise<void> {
+    await User.findById(id).updateOne(updates).exec();
   }
 }
 

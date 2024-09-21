@@ -240,8 +240,41 @@ const eventController = {
     } catch (error){
       handleError(response, error);
     }
-  }
+  },
 
+  approveEvent: async (request: Request, response: Response) => {
+    try{
+      const eventId = request.params.eventId;
+      const eventExist = await eventRepository.getEventById(eventId);
+      const event = await eventRepository.updateEventOne(eventId, {status : "open"});
+      
+
+      if (!eventExist){
+        throw new Error("Event not found");
+      }
+
+      return successResponseStatus(response, "event approved", event);
+    } catch (error) {
+      handleError(response, error);
+    }
+  },
+
+  rejectEvent: async (request: Request, response: Response) => {
+    try{
+      const eventId = request.params.eventId;
+      const eventExist = await eventRepository.getEventById(eventId);
+      const event = await eventRepository.updateEventOne(eventId, {status : "closed"});
+      
+      if (!eventExist) {
+        throw new Error("Event not found");
+      }
+
+      return successResponseStatus(response, "event rejected", event);
+    } catch (error) {
+      handleError(response, error);
+    }
+  }
+  
 };
 
 export default eventController;

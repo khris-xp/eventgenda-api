@@ -2,6 +2,8 @@ import express, { Router } from 'express';
 import eventController from '../controllers/event.controller';
 import authUser from '../middlewares/auth.middleware';
 import authOrganizer from '../middlewares/authOrganizer.middleware';
+import authController from '../controllers/user.controller';
+import authAdmin from '../middlewares/authAdmin.middleware';
 
 const eventRouter: Router = express.Router();
 
@@ -16,4 +18,11 @@ eventRouter.put('/status', authUser, authOrganizer, eventController.updateEventS
 eventRouter.post('/:id/funding', authUser, authOrganizer, eventController.fundingEvent);
 eventRouter.post('/:id/donate', authUser, eventController.donateEvent);
 
+eventRouter.post('/:eventId/join', authUser, eventController.joinEvent);
+eventRouter.post('/:eventId/exit', authUser,eventController.exitEvent);
+
+eventRouter.put('/:eventId/approve', authAdmin, eventController.approveEvent);
+eventRouter.put('/:eventId/reject', authAdmin, eventController.rejectEvent);
+
 export default eventRouter;
+

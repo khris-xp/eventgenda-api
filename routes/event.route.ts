@@ -16,4 +16,8 @@ eventRouter.put('/status', authUser, authOrganizer, eventController.updateEventS
 eventRouter.post('/:id/funding', authUser, authOrganizer, eventController.fundingEvent);
 eventRouter.post('/:id/donate', authUser, eventController.donateEvent);
 
+eventRouter.post('/:eventId/join', authUser, eventController.joinEvent);
+eventRouter.post('/:eventId/exit', authUser,eventController.exitEvent);
+
 export default eventRouter;
+

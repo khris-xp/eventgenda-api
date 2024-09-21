@@ -183,7 +183,65 @@ const eventController = {
   
   donateEvent: async (request: Request, response: Response) => {
     processEventFunding(request, response, 'donation');
+  },
+
+  
+  joinEvent: async (request: Request, response: Response) => {
+    try {
+
+      const userId = request.user?._id;
+      // console.log(userId);
+      const event = await eventRepository.getEventById(request.params.eventId);
+
+      if (event.status == null){
+        throw new Error('This event is not existed');
+      }
+      else if (event.status !== 'open'){
+        throw new Error('Event is not open for registration');
+      }
+
+      if (event.participants.includes(userId)) {
+        throw new Error('User already joined the Event.');
+      }
+
+      if (event.participants.length >= event.limit) {
+        throw new Error('Event is full');
+      }
+
+      event.participants.push(userId);
+
+      if (event.participants.length == event.limit){
+        event.status = 'closed';
+      }
+
+      await event.save();
+
+      return successResponseStatus(response, 'Join Event Successfully', event);
+    } catch (error){
+      handleError(response, error);
+    }
+  },
+
+  exitEvent: async (request: Request, response: Response) => {
+    try{
+
+      const userId = request.user?._id;
+      const event = await eventRepository.getEventById(request.params.eventId);
+
+      if (!event.participants.includes(userId)) {
+        throw new Error('User is not participant of the Event.');
+      }
+
+      event.participants = event.participants.filter((participantId) => participantId.toString() !== userId.toString());
+
+      await event.save();
+
+      return successResponseStatus(response, 'Successfully Exit event.', event);
+    } catch (error){
+      handleError(response, error);
+    }
   }
+
 };
 
 export default eventController;

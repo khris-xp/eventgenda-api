@@ -263,7 +263,7 @@ const eventController = {
     try{
       const eventId = request.params.eventId;
       const eventExist = await eventRepository.getEventById(eventId);
-      const event = await eventRepository.updateEventOne(eventId, {status : "closed"});
+      const event = await eventRepository.updateEventOne(eventId, {status : "rejected"});
       
       if (!eventExist) {
         throw new Error("Event not found");

@@ -28,9 +28,8 @@ const authAdmin = async (
       return res.status(401).json({ msg: 'User not found' });
     }
 
-    // Check if the role array includes 'admin'
-    if (!user.role.includes('admin')) {
-      return res.status(403).json({ msg: 'Access denied. Admin role required.' });
+    if (user.role !== 'admin') {
+      return res.status(401).json({ msg: 'Unauthorized' });
     }
 
     // If we reach here, the user is an admin

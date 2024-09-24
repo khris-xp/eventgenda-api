@@ -2,15 +2,12 @@ import { Request, Response } from 'express';
 import { handleError } from '../utils/error.utils';
 import { errorResponseStatus, successResponseStatus } from '../utils/response.utils';
 import locationRepository from '../repositories/location.repository';
-import {
-  CreateLocationDto,
-  UpdateLocationDto,
-} from '../common/dto/location.dto';
+import { CreateLocationDto, UpdateLocationDto } from '../common/dto/location.dto';
 
 const locationController = {
   getLocations: async (request: Request, response: Response) => {
     try {
-      const locations = await locationRepository.getAllLocations();
+      const locations = await locationRepository.getAll();
       return successResponseStatus(
         response,
         'Get all locations successfully.',
@@ -23,9 +20,7 @@ const locationController = {
 
   getLocation: async (request: Request, response: Response) => {
     try {
-      const location = await locationRepository.getLocationById(
-        request.params.id
-      );
+      const location = await locationRepository.getById(request.params.id);
       return successResponseStatus(
         response,
         'Get location by id successfully.',
@@ -38,9 +33,7 @@ const locationController = {
 
   getLocationByName: async (request: Request, response: Response) => {
     try {
-      const location = await locationRepository.getLocationByName(
-        request.params.name
-      );
+      const location = await locationRepository.getByName(request.params.name);
       return successResponseStatus(
         response,
         'Get location by name successfully.',
@@ -54,33 +47,14 @@ const locationController = {
   createLocation: async (request: Request, response: Response) => {
     try {
       const { name, location, prices, thumbnail } = request.body as CreateLocationDto;
-      
-      const locationExist = await locationRepository.getLocationByName(name);
-      if (locationExist) {
-        return errorResponseStatus(
-          400,
-          response,
-          'Location already exists.',
-          null
-        );
-      }
+      if (!name || !location || !prices) return errorResponseStatus(400, response, 'Please fill all the fields.', null);
 
-      if (!name || !location || !prices || !thumbnail) {
-        return errorResponseStatus(
-          400,
-          response,
-          'Please fill all the fields.',
-          null
-        );
-      }
-
-      const newLocation = await locationRepository.createLocation({
+      const newLocation = await locationRepository.create({
         name,
         location,
         prices,
         thumbnail,
       });
-
       return successResponseStatus(
         response,
         'Create location successfully.',
@@ -95,26 +69,10 @@ const locationController = {
     try {
       const { name, location, prices, thumbnail } = request.body as UpdateLocationDto;
       
-      const locationExist = await locationRepository.getLocationById(request.params.id);
-      if (!locationExist) {
-        return errorResponseStatus(
-          400,
-          response,
-          'Location not found.',
-          null
-        );
-      }
-      
-      if (!name || !location || !prices || !thumbnail) {
-        return errorResponseStatus(
-          400,
-          response,
-          'Please fill all the fields.',
-          null
-        );
-      }
+      const locationExist = await locationRepository.getById(request.params.id);
+      if (!locationExist) return errorResponseStatus(400, response, 'Location not found.', null);
 
-      const updateLocation = await locationRepository.updateLocation(
+      const updateLocation = await locationRepository.update(
         request.params.id,
         {
           name,
@@ -136,7 +94,7 @@ const locationController = {
 
   deleteLocation: async (request: Request, response: Response) => {
     try {
-      await locationRepository.deleteLocation(request.params.id);
+      await locationRepository.delete(request.params.id);
       return successResponseStatus(
         response,
         'Delete location successfully.',

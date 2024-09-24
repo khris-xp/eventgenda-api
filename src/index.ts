@@ -10,6 +10,7 @@ import locationRouter from '../routes/location.route';
 import eventRuleRouter from '../routes/eventRule.route';
 import paymentRouter from '../routes/payment.route';
 import eventRouter from '../routes/event.route';
+import rewardRouter from '../routes/reward.route';
 
 dotenv.config();
 
@@ -42,9 +43,10 @@ mongoose
 app.use('/api/auth', userRouter);
 app.use('/api/blogs', blogRouter);
 app.use('/api/location', locationRouter);
-app.use('/api/v1/eventRule', eventRuleRouter);
+app.use('/api/event-rule', eventRuleRouter);
 app.use('/api/payment', paymentRouter);
-app.use('api/event', eventRouter);
+app.use('/api/event', eventRouter);
+app.use('/api/reward', rewardRouter);
 app.listen(port, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
 });

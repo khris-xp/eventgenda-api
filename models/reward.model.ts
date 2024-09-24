@@ -1,8 +1,7 @@
-import mongoose from 'mongoose';
-import { RewardType } from '../types/reward';
-const { Schema } = mongoose;
+import mongoose, { Schema } from 'mongoose';
+import { RewardDocument } from '../types/reward.d';
 
-const rewardSchema = new Schema<RewardType>(
+const rewardSchema = new Schema<RewardDocument>(
   {
     name: { type: String, required: true },
     description: { type: String, required: true },
@@ -18,4 +17,6 @@ rewardSchema.pre('save', function(next) {
   next();
 });
 
-export default mongoose.model<RewardType>('Reward', rewardSchema);
+const RewardModel = mongoose.model<RewardDocument>('Reward', rewardSchema);
+
+export default RewardModel;

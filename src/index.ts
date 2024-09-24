@@ -12,6 +12,7 @@ import historyRouter from '../routes/history.route';
 import locationRouter from '../routes/location.route';
 import uploadRouter from '../routes/upload.route';
 import userRouter from '../routes/user.route';
+import eventRuleRouter from '../routes/eventRule.route';
 dotenv.config();
 
 
@@ -43,7 +44,7 @@ app.use('/api/events', eventRouter);
 app.use('/api/location', locationRouter);
 app.use('/api/uploads', uploadRouter);
 app.use('/api/project', projectRouter);
-
+app.use('/api/event-rule', eventRuleRouter);
 app.listen(port, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
   console.log(`[server]: Server is running at http://localhost:${port}`);

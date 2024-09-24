@@ -10,9 +10,11 @@ import categoryRouter from '../routes/category.route';
 import eventRouter from '../routes/event.route';
 import historyRouter from '../routes/history.route';
 import locationRouter from '../routes/location.route';
-import uploadRouter from '../routes/upload.route';
-import userRouter from '../routes/user.route';
 import eventRuleRouter from '../routes/eventRule.route';
+import paymentRouter from '../routes/payment.route';
+import rewardRouter from '../routes/reward.route';
+import userRouter from '../routes/user.route';
+
 dotenv.config();
 
 
@@ -37,20 +39,20 @@ app.use(
 app.get('/', (req: Request, res: Response) => {
   res.json({ message: 'Eventgenda is running!' });
 });
-
-app.use('/api/auth', userRouter);
-app.use('/api/blogs', blogRouter);
-app.use('/api/events', eventRouter);
-app.use('/api/location', locationRouter);
-app.use('/api/uploads', uploadRouter);
-app.use('/api/project', projectRouter);
-app.use('/api/event-rule', eventRuleRouter);
-app.listen(port, () => {
-  console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
-  console.log(`[server]: Server is running at http://localhost:${port}`);
-});
-
 mongoose
   .connect(URL as string)
   .then(() => console.log('MongoDB connected'))
   .catch((err) => console.log(err));
+
+// Routes
+app.use('/api/auth', userRouter);
+app.use('/api/blogs', blogRouter);
+app.use('/api/location', locationRouter);
+app.use('/api/event-rule', eventRuleRouter);
+app.use('/api/payment', paymentRouter);
+app.use('/api/event', eventRouter);
+app.use('/api/reward', rewardRouter);
+app.listen(port, () => {
+  console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
+});
+

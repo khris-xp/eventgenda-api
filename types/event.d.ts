@@ -24,7 +24,7 @@ export type EventType = {
   location: LocationType;
   amountRaised: number;
   amountRequired: number;
-  status: 'pending' | 'open' | 'closed' | 'rejected';
+  status: 'pending' | 'open' | 'closed';
   createdAt: Date;
   updatedAt: Date;
 } & Document;

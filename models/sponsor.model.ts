@@ -1,5 +1,5 @@
 import mongoose from 'mongoose';
-import { SponsorType } from '../types/sponsor';
+import { SponsorType } from '../types/sponsor.d';
 const { Schema } = mongoose;
 
 const sponsorSchema = new Schema<SponsorType>({

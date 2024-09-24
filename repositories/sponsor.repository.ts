@@ -1,5 +1,5 @@
 import { default as Sponsor } from '../models/sponsor.model';
-import { SponsorDocument } from '../types/sponsor';
+import { SponsorDocument } from '../types/sponsor.d';
 import { CreateSponsorDto, UpdateSponsorDto } from '../common/dto/sponsor.dto';
 
 class SponsorRepository {

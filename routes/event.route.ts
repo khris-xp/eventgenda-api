@@ -25,4 +25,3 @@ eventRouter.put('/:eventId/approve', authAdmin, eventController.approveEvent);
 eventRouter.put('/:eventId/reject', authAdmin, eventController.rejectEvent);
 
 export default eventRouter;
-

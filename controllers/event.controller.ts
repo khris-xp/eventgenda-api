@@ -123,6 +123,8 @@ const eventController = {
 
   createEvent: async (request: Request, response: Response) => {
     try {
+      const createdBy = request.user?._id;
+      request.body.createdBy = createdBy;
       const event = await eventRepository.createEvent(request.body);
       return successResponseStatus(
         response,

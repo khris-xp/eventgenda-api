@@ -9,11 +9,19 @@ class EventRepository extends BaseRepository<EventDocument> {
   }
 
   async getAllEvents(): Promise<EventDocument[]> {
-    return await this.model.find().exec();
+    return await this.model
+      .find()
+      .populate('categories')
+      .populate('createdBy')
+      .exec();
   }
 
   async getEventById(id: string): Promise<EventDocument> {
-    const result = await this.model.findById(id).exec();
+    const result = await this.model
+      .findById(id)
+      .populate('categories')
+      .populate('createdBy')
+      .exec();
     if (result === null) {
       throw new Error('Event not found');
     }
@@ -21,15 +29,27 @@ class EventRepository extends BaseRepository<EventDocument> {
   }
 
   async getEventByUserId(userId: string): Promise<EventDocument[]> {
-    return await this.model.find({ createdBy: userId }).exec();
+    return await this.model
+      .find({ createdBy: userId })
+      .populate('categories')
+      .populate('createdBy')
+      .exec();
   }
 
   async getEventByTitle(title: string): Promise<EventDocument[]> {
-    return await this.model.find({ title }).exec();
+    return await this.model
+      .find({ title })
+      .populate('categories')
+      .populate('createdBy')
+      .exec();
   }
 
-  async getEventByCategory(category: string): Promise<EventDocument[]> {
-    return await this.model.find({ category }).exec();
+  async getEventByCategory(categoryId: string): Promise<EventDocument[]> {
+    return await this.model
+      .find({ categories: categoryId })
+      .populate('categories')
+      .populate('createdBy')
+      .exec();
   }
 
   async createEvent(event: CreateEventDto): Promise<EventDocument> {
@@ -56,7 +76,10 @@ class EventRepository extends BaseRepository<EventDocument> {
     await this.model.findByIdAndDelete(id).exec();
   }
 
-  async updateEventOne(id: string, updates: Partial<CreateEventDto>): Promise<void> {
+  async updateEventOne(
+    id: string,
+    updates: Partial<CreateEventDto>
+  ): Promise<void> {
     await this.model.findById(id).updateOne(updates).exec();
   }
 }

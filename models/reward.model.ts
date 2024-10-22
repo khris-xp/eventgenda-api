@@ -7,16 +7,10 @@ const rewardSchema = new Schema<RewardDocument>(
     description: { type: String, required: true },
     price: { type: Number, required: true },
     image: { type: String, required: true },
-    createdDate: { type: Date, default: Date.now },
-    updatedDate: { type: Date, default: Date.now }
+  },
+  {
+    timestamps: true,
   }
 );
 
-rewardSchema.pre('save', function(next) {
-  this.updatedDate = new Date();
-  next();
-});
-
-const RewardModel = mongoose.model<RewardDocument>('Reward', rewardSchema);
-
-export default RewardModel;
+export default mongoose.model<RewardDocument>('Reward', rewardSchema);

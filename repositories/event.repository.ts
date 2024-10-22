@@ -13,6 +13,11 @@ class EventRepository extends BaseRepository<EventDocument> {
       .find()
       .populate('categories')
       .populate('createdBy')
+      .populate('participants')
+      .populate('sponsors')
+      .populate('rules')
+      .populate('projects')
+      .populate('location')
       .exec();
   }
 
@@ -21,6 +26,11 @@ class EventRepository extends BaseRepository<EventDocument> {
       .findById(id)
       .populate('categories')
       .populate('createdBy')
+      .populate('participants')
+      .populate('sponsors')
+      .populate('rules')
+      .populate('projects')
+      .populate('location')
       .exec();
     if (result === null) {
       throw new Error('Event not found');
@@ -33,6 +43,11 @@ class EventRepository extends BaseRepository<EventDocument> {
       .find({ createdBy: userId })
       .populate('categories')
       .populate('createdBy')
+      .populate('participants')
+      .populate('sponsors')
+      .populate('rules')
+      .populate('projects')
+      .populate('location')
       .exec();
   }
 
@@ -41,6 +56,11 @@ class EventRepository extends BaseRepository<EventDocument> {
       .find({ title })
       .populate('categories')
       .populate('createdBy')
+      .populate('participants')
+      .populate('sponsors')
+      .populate('rules')
+      .populate('projects')
+      .populate('location')
       .exec();
   }
 
@@ -49,6 +69,11 @@ class EventRepository extends BaseRepository<EventDocument> {
       .find({ categories: categoryId })
       .populate('categories')
       .populate('createdBy')
+      .populate('participants')
+      .populate('sponsors')
+      .populate('rules')
+      .populate('projects')
+      .populate('location')
       .exec();
   }
 

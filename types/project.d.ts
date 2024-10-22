@@ -1,5 +1,6 @@
 import { Document } from 'mongoose';
 import { EventDocument } from './event';
+import { UserDocument } from './user';
 
 export interface ProjectDocument extends Document {
   name: string;
@@ -7,6 +8,7 @@ export interface ProjectDocument extends Document {
   link: string;
   demo: string;
   event: EventDocument;
+  createdBy: UserDocument;
   createdDate: Date;
   updatedDate: Date;
 }

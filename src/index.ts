@@ -53,6 +53,7 @@ app.use('/api/event', eventRouter);
 app.use('/api/reward', rewardRouter);
 app.use('/api/history', historyRouter);
 app.use('/api/category', categoryRouter);
+app.use('/api/project', projectRouter);
 app.use('/api/sponsor', sponsorRouter);
 app.use('/api/organization', organizationRouter);
 app.listen(port, () => {

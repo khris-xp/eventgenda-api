@@ -1,35 +1,47 @@
-import { default as Sponsor } from '../models/sponsor.model';
-import { SponsorDocument } from '../types/sponsor.d';
 import { CreateSponsorDto, UpdateSponsorDto } from '../common/dto/sponsor.dto';
+import sponsorModel from '../models/sponsor.model';
+import { SponsorDocument } from '../types/sponsor.d';
+import BaseRepository from './entity.repository';
 
-class SponsorRepository {
-  async getAll(): Promise<SponsorDocument[]> {
-    return await Sponsor.find().exec();
+class SponsorRepository extends BaseRepository<SponsorDocument> {
+  constructor() {
+    super(sponsorModel);
   }
 
-  async getById(id: string): Promise<SponsorDocument> {
-    const result = await Sponsor.findById(id).exec();
-    if (!result) {
-      throw new Error('Sponsor not found');
-    }
-    return result;
+  async getAllSponsors(): Promise<SponsorDocument[]> {
+    return await this.model.find().populate('user').populate('event').exec();
   }
 
-  async getByUserId(userId: string): Promise<SponsorDocument[]> {
-    return await Sponsor.find({ user: userId }).exec();
+  async getSponsorById(id: string): Promise<SponsorDocument> {
+    return await this.model
+      .findById(id)
+      .populate('user')
+      .populate('event')
+      .exec();
   }
 
-  async getByEventId(id: string): Promise<SponsorDocument[]> {
-    return await Sponsor.find({ event: id }).exec();
+  async getSponsorsByUserId(userId: string): Promise<SponsorDocument[]> {
+    return await this.model.find({ user: userId }).exec();
   }
 
-  async create(create: CreateSponsorDto): Promise<SponsorDocument> {
-    const newSponsor = new Sponsor(create);
+  async getSponsorsByEventId(eventId: string): Promise<SponsorDocument[]> {
+    return await this.model.find({ event: eventId }).exec();
+  }
+
+  async createSponsor(create: CreateSponsorDto): Promise<SponsorDocument> {
+    const newSponsor = new this.model(create);
     return await newSponsor.save();
   }
 
-  async update(id: string, updates: UpdateSponsorDto): Promise<SponsorDocument> {
-    const sponsor = await Sponsor.findByIdAndUpdate(id, updates, { new: true }).exec();
+  async updateSponsor(
+    id: string,
+    updates: UpdateSponsorDto
+  ): Promise<SponsorDocument> {
+    const sponsor = await this.model
+      .findByIdAndUpdate(id, updates, {
+        new: true,
+      })
+      .exec();
     if (!sponsor) {
       throw new Error('Update sponsor failed');
     }
@@ -37,8 +49,8 @@ class SponsorRepository {
     return sponsor;
   }
 
-  async delete(id: string): Promise<void> {
-    await Sponsor.findByIdAndDelete(id).exec();
+  async deleteSponsor(id: string): Promise<void> {
+    await this.model.findByIdAndDelete(id).exec();
   }
 }
 

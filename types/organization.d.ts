@@ -12,6 +12,6 @@ export type OrganizationType = {
   createdEvents: EventType[];
   createdAt: Date;
   updatedAt: Date;
-};
+} & Document;
 
 export type OrganizationDocument = OrganizationType & Document;

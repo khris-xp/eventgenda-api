@@ -7,7 +7,7 @@ const blogSchema = new Schema<BlogType>(
     title: { type: String, required: true },
     description: { type: String, required: true },
     content: { type: String, required: true },
-    author: { type: String, required: true },
+    author: { type: Schema.Types.ObjectId, ref: 'User' },
     image: { type: String, required: true },
     category: { type: String, required: true },
   },

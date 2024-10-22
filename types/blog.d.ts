@@ -1,10 +1,11 @@
 import { Document } from 'mongoose';
+import { UserDocument } from './user';
 
 export type BlogType = {
   title: string;
   description: string;
   content: string;
-  author: string;
+  author: UserDocument;
   image: string;
   category: string;
 } & Document;

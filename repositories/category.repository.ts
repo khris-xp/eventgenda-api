@@ -17,10 +17,6 @@ class CategoryRepository{
         return result;
     }
 
-    // async getCategoryById(id: string): Promise<CategoryDocument>{
-    //     return await this.model.find({ id }).exec();
-    // }
-
     async getCategoryByName(name: string): Promise<CategoryDocument>{
         const result =  await Category.findOne({name: name}).exec();
         return result;

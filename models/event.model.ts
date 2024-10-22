@@ -22,11 +22,11 @@ const eventSchema = new Schema<EventType>(
     location: { type: Schema.Types.ObjectId, ref: 'Location' },
     amountRaised: { type: Number, default: 0 },
     amountRequired: { type: Number, required: true },
-    status: { 
-      type: String, 
-      default: 'pending', 
-      enum: ['pending', 'open', 'closed'] 
-    }
+    status: {
+      type: String,
+      default: 'pending',
+      enum: ['pending', 'open', 'closed'],
+    },
   },
   { timestamps: true }
 );

@@ -1,14 +1,14 @@
 import { Request, Response } from 'express';
+import { fundingEventDto } from '../common/dto/event.dto';
 import eventRepository from '../repositories/event.repository';
-import { handleError } from '../utils/error.utils';
-import { successResponseStatus } from '../utils/response.utils';
 import sponsorRepository from '../repositories/sponsor.repository';
 import userRepository from '../repositories/user.repository';
-import { fundingEventDto } from '../common/dto/event.dto';
+import { handleError } from '../utils/error.utils';
+import { successResponseStatus } from '../utils/response.utils';
 
 const processEventFunding = async (
-  request: Request, 
-  response: Response, 
+  request: Request,
+  response: Response,
   type: 'funding' | 'donation'
 ) => {
   try {
@@ -38,14 +38,15 @@ const processEventFunding = async (
 
     // Update the event's raised amount
     const newAmount = event.amountRaised + amount;
-    await eventRepository.updateEventOne(request.params.id, { amountRaised: newAmount });
+    await eventRepository.updateEventOne(request.params.id, {
+      amountRaised: newAmount,
+    });
 
     // Create a new sponsor
+
     const sponsor = await sponsorRepository.create({
       user: userId,
-      event: request.params.id,
-      amount,
-      type
+      ...request.body,
     });
 
     if (!sponsor) {
@@ -54,7 +55,9 @@ const processEventFunding = async (
 
     // Update the event status if the required amount is reached
     if (newAmount >= event.amountRequired) {
-      await eventRepository.updateEventOne(request.params.id, { status: 'open' });
+      await eventRepository.updateEventOne(request.params.id, {
+        status: 'open',
+      });
     }
 
     return successResponseStatus(
@@ -123,6 +126,8 @@ const eventController = {
   
   createEvent: async (request: Request, response: Response) => {
     try {
+      const createdBy = request.user?._id;
+      request.body.createdBy = createdBy;
       const event = await eventRepository.createEvent(request.body);
       return successResponseStatus(
         response,
@@ -180,10 +185,113 @@ const eventController = {
   fundingEvent: async (request: Request, response: Response) => {
     processEventFunding(request, response, 'funding');
   },
-  
+
   donateEvent: async (request: Request, response: Response) => {
     processEventFunding(request, response, 'donation');
-  }
+  },
+
+  joinEvent: async (request: Request, response: Response) => {
+    try {
+      const userId = request.user?._id;
+      // console.log(userId);
+      const event = await eventRepository.getEventById(request.params.eventId);
+
+      if (event.status == null) {
+        throw new Error('This event is not existed');
+      } else if (event.status !== 'open') {
+        throw new Error('Event is not open for registration');
+      }
+
+      if (event.participants.includes(userId)) {
+        throw new Error('User already joined the Event.');
+      }
+
+      if (event.participants.length >= event.limit) {
+        throw new Error('Event is full');
+      }
+
+      event.participants.push(userId);
+
+      if (event.participants.length == event.limit) {
+        event.status = 'closed';
+      }
+
+      await event.save();
+
+      return successResponseStatus(response, 'Join Event Successfully', event);
+    } catch (error) {
+      handleError(response, error);
+    }
+  },
+
+  exitEvent: async (request: Request, response: Response) => {
+    try {
+      const userId = request.user?._id;
+      const event = await eventRepository.getEventById(request.params.eventId);
+
+      if (!event) {
+        throw new Error('Event not found');
+      }
+
+      const isParticipant = event.participants.some((participantId) =>
+        participantId._id.equals(userId)
+      );
+
+      if (!isParticipant) {
+        throw new Error('User is not a participant of the Event');
+      }
+
+      event.participants = event.participants.filter(
+        (participantId) => !participantId._id.equals(userId)
+      );
+
+      await event.save();
+
+      return successResponseStatus(
+        response,
+        'Successfully exited event',
+        event
+      );
+    } catch (error) {
+      handleError(response, error);
+    }
+  },
+
+  approveEvent: async (request: Request, response: Response) => {
+    try {
+      const eventId = request.params.eventId;
+      const eventExist = await eventRepository.getEventById(eventId);
+      const event = await eventRepository.updateEventOne(eventId, {
+        status: 'open',
+      });
+
+      if (!eventExist) {
+        throw new Error('Event not found');
+      }
+
+      return successResponseStatus(response, 'event approved', event);
+    } catch (error) {
+      handleError(response, error);
+    }
+  },
+
+  rejectEvent: async (request: Request, response: Response) => {
+    try {
+      const eventId = request.params.eventId;
+      const eventExist = await eventRepository.getEventById(eventId);
+      const event = await eventRepository.updateEventOne(eventId, {
+        status: 'rejected',
+      });
+
+      if (!eventExist) {
+        throw new Error('Event not found');
+      }
+
+      return successResponseStatus(response, 'event rejected', event);
+    } catch (error) {
+      handleError(response, error);
+    }
+  },
 };
 
 export default eventController;

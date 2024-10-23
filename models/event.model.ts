@@ -7,7 +7,9 @@ const eventSchema = new Schema<EventType>(
     title: { type: String, required: true },
     description: { type: String, required: true },
     limit: { type: Number, required: true },
-    category: { type: Schema.Types.ObjectId, ref: 'Category' },
+    categories: [
+      { type: Schema.Types.ObjectId, ref: 'Category', required: true },
+    ],
     createdBy: { type: Schema.Types.ObjectId, ref: 'User' },
     eventStartDate: { type: Date, required: true },
     eventEndDate: { type: Date, required: true },
@@ -18,15 +20,19 @@ const eventSchema = new Schema<EventType>(
     rules: [{ type: Schema.Types.ObjectId, ref: 'EventRule' }],
     projects: [{ type: Schema.Types.ObjectId, ref: 'Project' }],
     prizes: [{ type: Number }],
-    thumbnail: { type: String, default: 'https://shorturl.at/nzKic' },
+    thumbnail: {
+      type: String,
+      default:
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRMfxwzJDsVxsOL-1O4mtouU1ci1Xxda0gKfQ&s',
+    },
     location: { type: Schema.Types.ObjectId, ref: 'Location' },
     amountRaised: { type: Number, default: 0 },
     amountRequired: { type: Number, required: true },
-    status: { 
-      type: String, 
-      default: 'pending', 
-      enum: ['pending', 'open', 'closed']
-    }
+    status: {
+      type: String,
+      default: 'pending',
+      enum: ['pending', 'open', 'closed'],
+    },
   },
   { timestamps: true }
 );

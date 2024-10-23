@@ -5,18 +5,22 @@ import { handleError } from '../utils/error.utils';
 const projectController = {
   createProject: async (req: Request, res: Response) => {
     try {
+      const createdBy = req.user?._id;
       const { name, description, link, demo, event } = req.body;
-      
+
       const newProject = new Project({
         name,
         description,
         link,
         demo,
         event,
+        createdBy,
       });
 
       await newProject.save();
-      return res.status(201).json({ message: 'Project created successfully', project: newProject });
+      return res
+        .status(201)
+        .json({ message: 'Project created successfully', project: newProject });
     } catch (error) {
       handleError(res, error);
     }
@@ -51,13 +55,17 @@ const projectController = {
       const { id } = req.params;
       const updatedData = req.body;
 
-      const project = await Project.findByIdAndUpdate(id, updatedData, { new: true });
+      const project = await Project.findByIdAndUpdate(id, updatedData, {
+        new: true,
+      });
 
       if (!project) {
         return res.status(404).json({ message: 'Project not found' });
       }
 
-      return res.status(200).json({ message: 'Project updated successfully', project });
+      return res
+        .status(200)
+        .json({ message: 'Project updated successfully', project });
     } catch (error) {
       handleError(res, error);
     }

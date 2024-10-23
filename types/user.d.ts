@@ -1,10 +1,10 @@
 import { Document, Types } from 'mongoose';
-import { OrganizationType } from './organization';
 import { HistoryType } from './history';
+import { OrganizationType } from './organization';
 
 export type UserType = {
   _id: mongoose.Schema.Types.ObjectId;
-  email: string; 
+  email: string;
   password: string;
   fullName: string;
   userName: string;
@@ -18,3 +18,5 @@ export type UserType = {
   createdAt: Date;
   updatedAt: Date;
 };
+
+export type UserDocument = UserType & Document;

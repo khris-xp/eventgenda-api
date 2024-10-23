@@ -2,7 +2,7 @@
 import express, { Router } from 'express';
 import eventRuleController from '../controllers/eventRule.controller';
 import authUser from '../middlewares/auth.middleware';
-import authAdmin from '../middlewares/authAdmin.middleware';
+import authOrganizer from '../middlewares/authOrganizer.middleware';
 
 const eventRuleRouter: Router = express.Router();
 
@@ -11,10 +11,10 @@ eventRuleRouter.get('/',  eventRuleController.getAllEventRules);
 // Get a specific event rule by ID 
 eventRuleRouter.get('/:id', eventRuleController.getEventRule);
 // Create a new event rule - restricted to admin users
-eventRuleRouter.post('/', authUser, authAdmin, eventRuleController.createEventRule);
+eventRuleRouter.post('/', authUser, authOrganizer, eventRuleController.createEventRule);
 // Update an existing event rule - restricted to admin users
-eventRuleRouter.put('/:id', authUser , authAdmin, eventRuleController.updateEventRule);
+eventRuleRouter.put('/:id', authUser , authOrganizer, eventRuleController.updateEventRule);
 // Delete an event rule - restricted to admin users
-eventRuleRouter.delete('/:id', authUser, authAdmin, eventRuleController.deleteEventRule);
+eventRuleRouter.delete('/:id', authUser, authOrganizer, eventRuleController.deleteEventRule);
 
 export default eventRuleRouter;

@@ -1,11 +1,14 @@
 import { Request, Response } from 'express';
+import { CreateSponsorDto, UpdateSponsorDto } from '../common/dto/sponsor.dto';
+import {
+  default as sponsorRepository,
+  default as SponsorRepository,
+} from '../repositories/sponsor.repository';
 import { handleError } from '../utils/error.utils';
 import {
   errorResponseStatus,
   successResponseStatus,
 } from '../utils/response.utils';
-import sponsorRepository from '../repositories/sponsor.repository';
-import { CreateSponsorDto, UpdateSponsorDto } from '../common/dto/sponsor.dto';
 
 const sponsorController = {
   getSponsors: async (request: Request, response: Response) => {
@@ -36,7 +39,9 @@ const sponsorController = {
 
   getSponsorByUser: async (request: Request, response: Response) => {
     try {
-      const sponsors = await sponsorRepository.getByUserId(request.params.id);
+      const sponsors = await sponsorRepository.getSponsorsByUserId(
+        request.params.id
+      );
       return successResponseStatus(
         response,
         'Get sponsor by user successfully.',
@@ -49,7 +54,9 @@ const sponsorController = {
 
   getSponsorByEvent: async (request: Request, response: Response) => {
     try {
-      const sponsors = await sponsorRepository.getByEventId(request.params.id);
+      const sponsors = await sponsorRepository.getSponsorsByEventId(
+        request.params.id
+      );
       return successResponseStatus(
         response,
         'Get sponsor by event successfully.',
@@ -66,7 +73,7 @@ const sponsorController = {
       const sponsor = await sponsorRepository.create({
         user: userId,
         ...request.body,
-      } as CreateSponsorDto);
+      });
 
       return successResponseStatus(
         response,
@@ -84,7 +91,7 @@ const sponsorController = {
       const sponsor = await sponsorRepository.update(request.params.id, {
         user: userId,
         ...request.body,
-      } as UpdateSponsorDto);
+      });
       return successResponseStatus(
         response,
         'Update sponsor successfully.',

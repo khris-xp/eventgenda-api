@@ -62,7 +62,7 @@ const blogController = {
 
   createBlog: async (request: Request, response: Response) => {
     try {
-      const { title, description, content, image, category, tags } =
+      const { title, description, content, image, category } =
         request.body;
       const author = request.user?._id;
       if (!author)

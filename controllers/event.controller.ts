@@ -229,17 +229,29 @@ const eventController = {
       const userId = request.user?._id;
       const event = await eventRepository.getEventById(request.params.eventId);
 
-      if (!event.participants.includes(userId)) {
-        throw new Error('User is not participant of the Event.');
+      if (!event) {
+        throw new Error('Event not found');
+      }
+
+      const isParticipant = event.participants.some((participantId) =>
+        participantId._id.equals(userId)
+      );
+
+      if (!isParticipant) {
+        throw new Error('User is not a participant of the Event');
       }
 
       event.participants = event.participants.filter(
-        (participantId) => participantId.toString() !== userId.toString()
+        (participantId) => !participantId._id.equals(userId)
       );
 
       await event.save();
 
-      return successResponseStatus(response, 'Successfully Exit event.', event);
+      return successResponseStatus(
+        response,
+        'Successfully exited event',
+        event
+      );
     } catch (error) {
       handleError(response, error);
     }

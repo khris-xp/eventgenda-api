@@ -16,10 +16,7 @@ cloudinary.config({
 
 const uploadController = {
     uploadImage: async (request: Request, response: Response) => {
-        try {
-          //console.log('Request files:', request.files);
-          //console.log('Request body:', request.body);
-      
+        try { 
           if (!request.files || Object.keys(request.files).length === 0) {
             console.log('No files detected in request');
             return response.status(400).json({ msg: 'No files were uploaded.' });

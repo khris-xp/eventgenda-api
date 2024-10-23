@@ -12,7 +12,12 @@ class EventRepository extends BaseRepository<EventDocument> {
     return await this.model
       .find()
       .populate('categories')
-      .populate('createdBy')
+      .populate({
+        path: 'createdBy',
+        populate: {
+          path: 'organization',
+        },
+      })
       .populate('participants')
       .populate('sponsors')
       .populate('rules')
@@ -25,7 +30,12 @@ class EventRepository extends BaseRepository<EventDocument> {
     const result = await this.model
       .findById(id)
       .populate('categories')
-      .populate('createdBy')
+      .populate({
+        path: 'createdBy',
+        populate: {
+          path: 'organization',
+        },
+      })
       .populate('participants')
       .populate('sponsors')
       .populate('rules')

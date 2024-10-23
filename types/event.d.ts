@@ -9,7 +9,7 @@ export type EventType = {
   title: string;
   description: string;
   limit: number;
-  categories: CategoryType[];
+  category: CategoryType;
   createdBy: UserType;
   eventStartDate: Date;
   eventEndDate: Date;

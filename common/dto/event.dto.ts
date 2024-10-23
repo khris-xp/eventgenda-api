@@ -2,7 +2,7 @@ export type CreateEventDto = {
   title: string;
   description: string;
   limit: number;
-  categories: string[];
+  categories: string;
   createdBy: string;
   eventStartDate: Date;
   eventEndDate: Date;

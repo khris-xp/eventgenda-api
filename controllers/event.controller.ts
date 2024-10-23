@@ -19,7 +19,7 @@ const processEventFunding = async (
     if (event.status === 'closed') {
       throw new Error('Event is closed');
     }
-
+    
     if (amount < 0) {
       throw new Error('Amount must be greater than 0');
     }
@@ -120,7 +120,7 @@ const eventController = {
       handleError(response, error);
     }
   },
-
+  
   createEvent: async (request: Request, response: Response) => {
     try {
       const event = await eventRepository.createEvent(request.body);

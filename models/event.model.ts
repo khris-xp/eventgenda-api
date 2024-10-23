@@ -7,7 +7,7 @@ const eventSchema = new Schema<EventType>(
     title: { type: String, required: true },
     description: { type: String, required: true },
     limit: { type: Number, required: true },
-    categories: [{ type: Schema.Types.ObjectId, ref: 'Category' }],
+    category: { type: Schema.Types.ObjectId, ref: 'Category' },
     createdBy: { type: Schema.Types.ObjectId, ref: 'User' },
     eventStartDate: { type: Date, required: true },
     eventEndDate: { type: Date, required: true },
@@ -25,7 +25,7 @@ const eventSchema = new Schema<EventType>(
     status: { 
       type: String, 
       default: 'pending', 
-      enum: ['pending', 'open', 'closed'] 
+      enum: ['pending', 'open', 'closed']
     }
   },
   { timestamps: true }

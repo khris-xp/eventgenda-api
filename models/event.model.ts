@@ -22,16 +22,15 @@ const eventSchema = new Schema<EventType>(
     prizes: [{ type: Number }],
     thumbnail: {
       type: String,
-      default:
-        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRMfxwzJDsVxsOL-1O4mtouU1ci1Xxda0gKfQ&s',
+      default: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRMfxwzJDsVxsOL-1O4mtouU1ci1Xxda0gKfQ&s',
     },
     location: { type: Schema.Types.ObjectId, ref: 'Location' },
     amountRaised: { type: Number, default: 0 },
-    amountRequired: { type: Number, required: true },
+    amountRequired: { type: Number, default: 0 },
     status: {
       type: String,
       default: 'pending',
-      enum: ['pending', 'open', 'closed'],
+      enum: ['pending', 'funding', 'open', 'closed', 'rejected', 'cancelled'],
     },
   },
   { timestamps: true }

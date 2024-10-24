@@ -1,8 +1,5 @@
 export type PaymentDto = {
-    user: string;
-    event: string;
-    amount: number;
-    paymentType: string;
-    status: string;
-    transactionId: string;
-  };
+  user: string;
+  total: number;
+  status: string;
+};

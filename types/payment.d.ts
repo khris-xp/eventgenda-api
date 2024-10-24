@@ -1,11 +1,10 @@
-import mongoose from 'mongoose';
+import mongoose, { Document } from 'mongoose';
 
 export type PaymentType = {
   _id: mongoose.Types.ObjectId;
   user: mongoose.Types.ObjectId;
-  event: mongoose.Types.ObjectId;
-  amount: number;
-  paymentType: string;
+  total: number;
   status: string;
-  transactionId: string;
-};
+} & Document;
+
+export type PaymentDocument = PaymentType & Document;

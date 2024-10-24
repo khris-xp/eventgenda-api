@@ -11,7 +11,6 @@ const organizationSchema = new Schema<OrganizationType>(
     funding: { type: Number, default: 0 },
     coin: { type: Number, default: 0 },
     credit: { type: Number, default: 0 },
-    createdEvents: [{ type: Schema.Types.ObjectId, ref: 'Event' }],
   },
   {
     timestamps: true,

@@ -35,7 +35,7 @@ const organizationController = {
   getOrganizationByUser: async (request: Request, response: Response) => {
     try {
       // get user ID from request
-      const userId = request.user?._id;
+      const userId = request.params.userId;
 
       // Fetch user
       const user = await userRepository.findById(userId);
@@ -44,7 +44,7 @@ const organizationController = {
       // Fetch organizations
       const organization = await organizationRepository.getById(user.organization._id);
       if (!organization) return errorResponseStatus(404, response, 'Organization not found', null);
-      
+
       return successResponseStatus(
         response,
         'Get organizations by user successfully.',
@@ -90,10 +90,11 @@ const organizationController = {
   updateOrganization: async (request: Request, response: Response) => {
     try {
       // validate request fields
-      const { name, description, profileImage } = request.body as UpdateOrgDto;
+      const { name, description, profileImage } = request.body as CreateOrgDto;
 
       // Fetch user and check permission
-      const user = await userRepository.findById(request.user?._id);
+      const userId = request.params.userId;
+      const user = await userRepository.findById(userId);
       if (!user) return errorResponseStatus(404, response, 'User not found', null);
       if (user.role !== 'organizer') return errorResponseStatus(403, response, 'User is not an organizer', null);
 
@@ -114,7 +115,8 @@ const organizationController = {
   deleteOrganization: async (request: Request, response: Response) => {
     try {
       // Fetch user and check permission
-      const user = await userRepository.findById(request.user?._id);
+      const userId = request.params.userId;
+      const user = await userRepository.findById(userId);
       if (!user) return errorResponseStatus(404, response, 'User not found', null);
       if (user.role !== 'organizer') return errorResponseStatus(403, response, 'User is not an organizer', null);
 

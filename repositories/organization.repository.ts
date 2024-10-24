@@ -20,12 +20,16 @@ class OrganizationRepository {
     return await organization.save();
   }
 
-  async update(id: string, update: UpdateOrgDto): Promise<OrganizationDocument> {
+  async update(id: string, update: CreateOrgDto): Promise<OrganizationDocument> {
     const organization = await Organization.findByIdAndUpdate(id, update, { new: true }).exec();
     if (!organization) {
       throw new Error('Update organization failed');
     }
     return organization;
+  }
+
+  async updateOne(id: string, updates: Partial<UpdateOrgDto>): Promise<void> {
+    await Organization.findById(id).updateOne(updates).exec();
   }
 
   async delete(id: string): Promise<void> {

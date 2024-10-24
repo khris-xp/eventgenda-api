@@ -52,7 +52,7 @@ const historyController = {
 
   createHistory: async (request: Request, response: Response) => {
     try {
-      const { event, user } = request.body as CreateHistoryDto;
+      const { event, user, action } = request.body as CreateHistoryDto;
 
       if (!event || !user) {
         return errorResponseStatus(
@@ -66,6 +66,7 @@ const historyController = {
       const newHistory = await historyRepository.createHistory({
         event,
         user,
+        action,
       });
 
       return successResponseStatus(
@@ -80,7 +81,7 @@ const historyController = {
 
   updateHistory: async (request: Request, response: Response) => {
     try {
-      const { event, user } = request.body as UpdateHistoryDto;
+      const { event, user, action } = request.body as UpdateHistoryDto;
 
       const historyExist = await historyRepository.getHistoryById(
         request.params.id
@@ -104,6 +105,7 @@ const historyController = {
         {
           event,
           user,
+          action,
         }
       );
 

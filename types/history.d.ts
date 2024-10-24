@@ -7,6 +7,7 @@ export type HistoryType = {
   _id: mongoose.Schema.ObjectId;
   event: EventDocument;
   user: UserDocument;
+  action: string
   createdAt: Date;
   updatedAt: Date;
 } & Document;

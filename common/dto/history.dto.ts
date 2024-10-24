@@ -1,8 +1,7 @@
 export type CreateHistoryDto = {
-    //fix later
     event : string,
-    //fix later
     user : string,
+    action : string
 }
 
 export type UpdateHistoryDto = CreateHistoryDto;

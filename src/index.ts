@@ -16,6 +16,7 @@ import projectRouter from '../routes/project.route';
 import rewardRouter from '../routes/reward.route';
 import sponsorRouter from '../routes/sponsor.route';
 import userRouter from '../routes/user.route';
+import uploadRouter from '../routes/upload.route';
 
 dotenv.config();
 
@@ -56,6 +57,7 @@ app.use('/api/category', categoryRouter);
 app.use('/api/project', projectRouter);
 app.use('/api/sponsor', sponsorRouter);
 app.use('/api/organization', organizationRouter);
+app.use('/api/uploads', uploadRouter);
 app.listen(port, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${port}`);
 });

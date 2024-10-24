@@ -12,7 +12,7 @@ import historyRouter from '../routes/history.route';
 import locationRouter from '../routes/location.route';
 import organizationRouter from '../routes/organization.route';
 import paymentRouter from '../routes/payment.route';
-import projectRouter from '../routes/project.routes';
+import projectRouter from '../routes/project.route';
 import rewardRouter from '../routes/reward.route';
 import sponsorRouter from '../routes/sponsor.route';
 import userRouter from '../routes/user.route';

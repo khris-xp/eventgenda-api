@@ -18,12 +18,21 @@ class historyRepository {
     return result;
   }
   async getHistoryByUser(user: string): Promise<HistoryDocument[]> {
-    const result = History.find({ user: user }).exec();
+    const result = History.find({ user: user }).populate('event').select('-user').exec();
 
     if (result === null) {
       throw new Error('History not found');
     }
 
+    return result;
+  }
+
+  async getHistoryByUserAndEvent(user: string, event: string): Promise<HistoryDocument> {
+    const result = await History.findOne({ event: event, user: user }).exec();
+
+    if (result === null) {
+      throw new Error('History not found');
+    }
     return result;
   }
 
@@ -41,6 +50,10 @@ class historyRepository {
       throw new Error('update history failed');
     }
     return history;
+  }
+
+  async updateHistoryOne(id: string, updates: Partial<UpdateHistoryDto>): Promise<void> {
+    await History.findById(id).updateOne(updates).exec();
   }
 
   async deleteHistory(id: string): Promise<void> {

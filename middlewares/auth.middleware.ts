@@ -7,7 +7,7 @@ interface AuthRequest extends Request {
   user?: UserType;
 }
 
-const authUser = (req: AuthRequest, res: Response, next: NextFunction) => {
+const verifyToken = (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
     const authHeader = req.header('Authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -35,4 +35,4 @@ const authUser = (req: AuthRequest, res: Response, next: NextFunction) => {
   }
 };
 
-export default authUser;
+export default verifyToken;

@@ -1,19 +1,12 @@
 import { Request, Response } from 'express';
-import { CreateSponsorDto, UpdateSponsorDto } from '../common/dto/sponsor.dto';
-import {
-  default as sponsorRepository,
-  default as SponsorRepository,
-} from '../repositories/sponsor.repository';
+import { default as sponsorRepository } from '../repositories/sponsor.repository';
 import { handleError } from '../utils/error.utils';
-import {
-  errorResponseStatus,
-  successResponseStatus,
-} from '../utils/response.utils';
+import { errorResponseStatus, successResponseStatus } from '../utils/response.utils';
 
 const sponsorController = {
   getSponsors: async (request: Request, response: Response) => {
     try {
-      const sponsors = await sponsorRepository.getAll();
+      const sponsors = await sponsorRepository.getAllSponsors();
       return successResponseStatus(
         response,
         'Get all sponsors successfully.',
@@ -26,7 +19,7 @@ const sponsorController = {
 
   getSponsor: async (request: Request, response: Response) => {
     try {
-      const sponsor = await sponsorRepository.getById(request.params.id);
+      const sponsor = await sponsorRepository.getSponsorById(request.params.id);
       return successResponseStatus(
         response,
         'Get sponsor by id successfully.',
@@ -70,10 +63,14 @@ const sponsorController = {
   createSponsor: async (request: Request, response: Response) => {
     try {
       const userId = request.user?._id;
-      const sponsor = await sponsorRepository.create({
+      const sponsor = await sponsorRepository.createSponsor({
         user: userId,
         ...request.body,
       });
+
+      if (!sponsor) {
+        return errorResponseStatus(400, response, 'Create sponsor failed.', null);
+      }
 
       return successResponseStatus(
         response,
@@ -88,7 +85,7 @@ const sponsorController = {
   updateSponsor: async (request: Request, response: Response) => {
     try {
       const userId = request.user?._id;
-      const sponsor = await sponsorRepository.update(request.params.id, {
+      const sponsor = await sponsorRepository.updateSponsor(request.params.id, {
         user: userId,
         ...request.body,
       });
@@ -104,7 +101,7 @@ const sponsorController = {
 
   deleteSponsor: async (request: Request, response: Response) => {
     try {
-      await sponsorRepository.delete(request.params.id);
+      await sponsorRepository.deleteSponsor(request.params.id);
       return successResponseStatus(
         response,
         'Delete sponsor successfully.',

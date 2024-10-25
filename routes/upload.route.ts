@@ -1,10 +1,11 @@
 import express, { Router } from 'express';
 import uploadController from '../controllers/upload.controller';
-import authUser from '../middlewares/auth.middleware';
+import verifyToken from '../middlewares/auth.middleware';
+import authorizeRoles from '../middlewares/role.middleware';
 
 const uploadRouter: Router = express.Router();
 
-uploadRouter.post('/upload', authUser, uploadController.uploadImage);
-uploadRouter.post('/destroy', authUser, uploadController.deleteImage);
+uploadRouter.post('/upload', verifyToken, authorizeRoles("user", "organizer", "admin"), uploadController.uploadImage);
+uploadRouter.post('/destroy', verifyToken, authorizeRoles("user", "organizer", "admin"), uploadController.deleteImage);
 
 export default uploadRouter;

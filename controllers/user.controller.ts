@@ -8,6 +8,7 @@ import { UserType } from '../types/user';
 import { handleError } from '../utils/error.utils';
 import { successResponseStatus } from '../utils/response.utils';
 import { generateTokens, setRefreshTokenCookie } from '../utils/token.utils';
+import historyRepository from '../repositories/history.repository';
 
 declare global {
   namespace Express {
@@ -115,10 +116,17 @@ const authController = {
     try {
       const userId = request.user?._id;
       const user = await userRepository.findById(userId);
+      const userHistory = await historyRepository.getHistoryByUser(userId);
+      
+      const responseUser = {
+        ...user.toObject(),
+        history: userHistory,
+      }
+
       return successResponseStatus(
         response,
         'Get user profile successfully.',
-        user
+        responseUser
       );
     } catch (error) {
       handleError(response, error);

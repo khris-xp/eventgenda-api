@@ -9,7 +9,6 @@ export type OrganizationType = {
   funding: number;
   coin: number;
   credit: number;
-  createdEvents: EventType[];
   createdAt: Date;
   updatedAt: Date;
 } & Document;

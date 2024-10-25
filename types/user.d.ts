@@ -14,7 +14,6 @@ export type UserType = {
   role: 'user' | 'admin' | 'organizer';
   profileImage: string;
   organization: OrganizationType;
-  history: HistoryType[];
   createdAt: Date;
   updatedAt: Date;
 };

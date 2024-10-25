@@ -1,23 +1,23 @@
 import { Router } from 'express';
 import paymentController from '../controllers/payment.controller';
-import authUser from '../middlewares/auth.middleware';
-import authAdmin from '../middlewares/authAdmin.middleware';
+import verifyToken from '../middlewares/auth.middleware';
+import authorizeRoles from '../middlewares/role.middleware';
 
 const paymentRouter = Router();
 
 // Get all payments (admin only)
-paymentRouter.get('/', authUser, authAdmin, paymentController.findAll);
+paymentRouter.get('/', verifyToken, authorizeRoles("admin"), paymentController.findAll);
 
 // Get a specific payment
-paymentRouter.get('/:id', authUser, paymentController.findOne);
+paymentRouter.get('/:id', verifyToken, authorizeRoles("user", "organizer", "admin"), paymentController.findOne);
 
 // Create a new payment
-paymentRouter.post('/', authUser, paymentController.create);
+paymentRouter.post('/', verifyToken, authorizeRoles("user", "organizer"), paymentController.create);
 
 // Update a payment (admin only)
-paymentRouter.put('/:id', authUser, authAdmin, paymentController.update);
+paymentRouter.put('/:id', verifyToken, authorizeRoles("admin"), paymentController.update);
 
 // Delete a payment (admin only)
-paymentRouter.delete('/:id', authUser, authAdmin, paymentController.delete);
+paymentRouter.delete('/:id', verifyToken, authorizeRoles("admin"), paymentController.delete);
 
 export default paymentRouter;

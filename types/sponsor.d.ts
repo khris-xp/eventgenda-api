@@ -7,7 +7,7 @@ export type SponsorType = {
   user: UserType;
   event: EventType;
   amount: number;
-  type: 'funding' | 'donation';
+  type: string;
   createdAt: Date;
   updatedAt: Date;
 } & Document;

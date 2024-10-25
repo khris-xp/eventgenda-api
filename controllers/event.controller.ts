@@ -5,6 +5,8 @@ import sponsorRepository from '../repositories/sponsor.repository';
 import userRepository from '../repositories/user.repository';
 import { handleError } from '../utils/error.utils';
 import { successResponseStatus } from '../utils/response.utils';
+import historyRepository from '../repositories/history.repository';
+import organizationRepository from '../repositories/organization.repository';
 
 const processEventFunding = async (
   request: Request,
@@ -16,10 +18,10 @@ const processEventFunding = async (
     const { amount } = request.body as fundingEventDto;
     const event = await eventRepository.getEventById(request.params.id);
 
-    if (event.status === 'closed') {
-      throw new Error('Event is closed');
+    if (event.status !== 'funding') {
+      throw new Error('The event is not currently in the funding phase.');
     }
-
+    
     if (amount < 0) {
       throw new Error('Amount must be greater than 0');
     }
@@ -28,11 +30,25 @@ const processEventFunding = async (
       throw new Error('Event has reached the required amount');
     }
 
-    // update user's coin
+    // check user's coin
     const user = await userRepository.findById(userId);
     if (user.coin < amount) {
       throw new Error('User does not have enough coin to fund this event');
     }
+
+    // Create a new sponsor
+    const sponsor = await sponsorRepository.createSponsor({
+      user: userId,
+      event: request.params.id,
+      amount: amount,
+      type: type,
+    });
+
+    if (!sponsor) {
+      throw new Error('Failed to create sponsor');
+    }
+
+    // update user's coin
     const newCoin = user.coin - amount;
     await userRepository.updateOne(userId, { coin: newCoin });
 
@@ -41,17 +57,12 @@ const processEventFunding = async (
     await eventRepository.updateEventOne(request.params.id, {
       amountRaised: newAmount,
     });
-
-    // Create a new sponsor
-
-    const sponsor = await sponsorRepository.create({
-      user: userId,
-      ...request.body,
-    });
-
-    if (!sponsor) {
-      throw new Error('Failed to create sponsor');
-    }
+    
+    // update organization's coin
+    const organizer = await userRepository.findById(event.createdBy as unknown as string);
+    const organization = await organizationRepository.getById(organizer.organization as unknown as string);
+    const newFunding = organization.funding + amount;
+    await organizationRepository.updateOne(organization._id as unknown as string, { funding: newFunding });
 
     // Update the event status if the required amount is reached
     if (newAmount >= event.amountRequired) {
@@ -123,12 +134,13 @@ const eventController = {
       handleError(response, error);
     }
   },
-
+  
   createEvent: async (request: Request, response: Response) => {
     try {
       const createdBy = request.user?._id;
       request.body.createdBy = createdBy;
       const event = await eventRepository.createEvent(request.body);
+      
       return successResponseStatus(
         response,
         'Create event successfully.',
@@ -162,20 +174,6 @@ const eventController = {
         response,
         'Delete event successfully.',
         null
-      );
-    } catch (error) {
-      handleError(response, error);
-    }
-  },
-
-  updateEventStatus: async (request: Request, response: Response) => {
-    try {
-      const { id, status } = request.body;
-      const event = eventRepository.updateEventOne(id, { status });
-      return successResponseStatus(
-        response,
-        'Update event status successfully',
-        event
       );
     } catch (error) {
       handleError(response, error);
@@ -218,6 +216,16 @@ const eventController = {
 
       await event.save();
 
+      const userHistory = await historyRepository.createHistory({
+        user: userId,
+        event: request.params.eventId,
+        action: 'participated',
+      });
+
+      if (!userHistory) {
+        throw new Error('Failed to create history');
+      }
+
       return successResponseStatus(response, 'Join Event Successfully', event);
     } catch (error) {
       handleError(response, error);
@@ -247,6 +255,13 @@ const eventController = {
 
       await event.save();
 
+      const userHistory = await historyRepository.getHistoryByUserAndEvent(userId, request.params.eventId);
+      if (!userHistory) {
+        throw new Error('Failed to get history');
+      }
+
+      await historyRepository.updateHistoryOne(userHistory._id, { action: 'exited' });
+
       return successResponseStatus(
         response,
         'Successfully exited event',
@@ -261,14 +276,26 @@ const eventController = {
     try {
       const eventId = request.params.eventId;
       const eventExist = await eventRepository.getEventById(eventId);
-      const event = await eventRepository.updateEventOne(eventId, {
-        status: 'open',
-      });
 
       if (!eventExist) {
         throw new Error('Event not found');
       }
 
+      const status = eventExist.amountRequired === 0 ? 'open' : 'funding';
+      const event = await eventRepository.updateEventOne(eventId, {
+        status: status,
+      });
+
+      const userHistory = await historyRepository.createHistory({
+        user: (eventExist.createdBy as unknown as string),
+        event: eventId,
+        action: 'created',
+      })
+
+      if (!userHistory) {
+        throw new Error('Failed to create history');
+      }
+      
       return successResponseStatus(response, 'event approved', event);
     } catch (error) {
       handleError(response, error);
@@ -279,12 +306,23 @@ const eventController = {
     try {
       const eventId = request.params.eventId;
       const eventExist = await eventRepository.getEventById(eventId);
+      
+      if (!eventExist) {
+        throw new Error('Event not found');
+      }
+      
       const event = await eventRepository.updateEventOne(eventId, {
         status: 'rejected',
       });
 
-      if (!eventExist) {
-        throw new Error('Event not found');
+      const userHistory = await historyRepository.createHistory({
+        user: (eventExist.createdBy as unknown as string),
+        event: eventId,
+        action: 'cancelled',
+      })
+
+      if (!userHistory) {
+        throw new Error('Failed to create history');
       }
 
       return successResponseStatus(response, 'event rejected', event);

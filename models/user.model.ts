@@ -19,7 +19,6 @@ const userSchema = new Schema<UserType>(
     },
     profileImage: { type: String, default: 'https://shorturl.at/CQtT2' },
     organization: { type: Schema.Types.ObjectId, ref: 'Organization' },
-    history: [{ type: Schema.Types.ObjectId, ref: 'History' }],
   },
   {
     timestamps: true,

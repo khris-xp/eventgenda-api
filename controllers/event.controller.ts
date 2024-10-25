@@ -1,12 +1,13 @@
 import { Request, Response } from 'express';
-import { fundingEventDto } from '../common/dto/event.dto';
+import { CreateEventDto, fundingEventDto } from '../common/dto/event.dto';
 import eventRepository from '../repositories/event.repository';
 import sponsorRepository from '../repositories/sponsor.repository';
 import userRepository from '../repositories/user.repository';
 import { handleError } from '../utils/error.utils';
-import { successResponseStatus } from '../utils/response.utils';
+import { successResponseStatus, errorResponseStatus } from '../utils/response.utils';
 import historyRepository from '../repositories/history.repository';
 import organizationRepository from '../repositories/organization.repository';
+import locationRepository from '../repositories/location.repository';
 
 const processEventFunding = async (
   request: Request,
@@ -17,26 +18,35 @@ const processEventFunding = async (
     const userId = request.user?._id;
     const { amount } = request.body as fundingEventDto;
     const event = await eventRepository.getEventById(request.params.id);
+    const createdBy = event.createdBy as unknown as string;
 
     if (event.status !== 'funding') {
-      throw new Error('The event is not currently in the funding phase.');
+      return errorResponseStatus(400, response, 'This event is not currently open for funding.', null);
     }
     
-    if (amount < 0) {
-      throw new Error('Amount must be greater than 0');
+    if (userId === createdBy) {
+      return errorResponseStatus(400, response, 'You cannot fund your own event.', null);
+    }
+
+    if (event.participants.includes(userId)) {
+      return errorResponseStatus(400, response, 'You cannot fund an event you are already participating in.', null);
+    }
+
+    if (amount <= 0) {
+      return errorResponseStatus(400, response, 'Amount must be greater than 0.', null);
     }
 
     if (event.amountRaised >= event.amountRequired) {
-      throw new Error('Event has reached the required amount');
+      return errorResponseStatus(400, response, 'This event has reached the required amount.', null);
     }
 
     // check user's coin
     const user = await userRepository.findById(userId);
     if (user.coin < amount) {
-      throw new Error('User does not have enough coin to fund this event');
+      return errorResponseStatus(400, response, 'Not enough coin.', null);
     }
 
-    // Create a new sponsor
+    // Create a new sponsor and add it to the event
     const sponsor = await sponsorRepository.createSponsor({
       user: userId,
       event: request.params.id,
@@ -44,32 +54,30 @@ const processEventFunding = async (
       type: type,
     });
 
-    if (!sponsor) {
-      throw new Error('Failed to create sponsor');
-    }
-
-    // update user's coin
-    const newCoin = user.coin - amount;
-    await userRepository.updateOne(userId, { coin: newCoin });
+    if (!sponsor) return errorResponseStatus(400, response, 'Failed to create sponsor.', null);
+    event.sponsors.push(sponsor._id);
 
     // Update the event's raised amount
     const newAmount = event.amountRaised + amount;
-    await eventRepository.updateEventOne(request.params.id, {
-      amountRaised: newAmount,
-    });
-    
-    // update organization's coin
-    const organizer = await userRepository.findById(event.createdBy as unknown as string);
-    const organization = await organizationRepository.getById(organizer.organization as unknown as string);
-    const newFunding = organization.funding + amount;
-    await organizationRepository.updateOne(organization._id as unknown as string, { funding: newFunding });
+    event.amountRaised = newAmount;
 
-    // Update the event status if the required amount is reached
     if (newAmount >= event.amountRequired) {
-      await eventRepository.updateEventOne(request.params.id, {
-        status: 'open',
-      });
+      event.status = 'open';
     }
+
+    await event.save();
+
+    // update organization's coin
+    const organizer = await userRepository.findById(createdBy);
+    const organization = await organizationRepository.getById(organizer.organization as string);
+    organization.funding += amount;
+    await organization.save();
+    
+    // update coin and reward to user
+    user.coin -= amount;
+    const reward = amount * 0.1;
+    user.reward += reward;
+    await user.save();
 
     return successResponseStatus(
       response,
@@ -137,8 +145,39 @@ const eventController = {
   
   createEvent: async (request: Request, response: Response) => {
     try {
-      const createdBy = request.user?._id;
-      request.body.createdBy = createdBy;
+      const userId = request.user?._id;
+      const { title, location, eventStartDate, eventEndDate, registrationStartDate, registrationEndDate } = request.body as CreateEventDto;
+
+      // validate date
+      if (eventStartDate >= eventEndDate) {
+        return errorResponseStatus(400, response, 'Event start date must be before event end date.', null);
+      }
+
+      if (registrationStartDate >= registrationEndDate) {
+        return errorResponseStatus(400, response, 'Registration start date must be before registration end date.', null);
+      }
+
+      if (registrationStartDate >= eventStartDate) {
+        return errorResponseStatus(400, response, 'Registration start date must be before event start date.', null);
+      }
+
+      if (registrationEndDate >= eventEndDate) {
+        return errorResponseStatus(400, response, 'Registration end date must be before event end date.', null);
+      }
+
+      // validate title
+      const existingEvent = await eventRepository.getEventByTitle(title);
+      if (existingEvent.length > 0) {
+        return errorResponseStatus(400, response, 'Event title already exists.', null);
+      }
+
+      // validate location
+      const existingLocation = await locationRepository.getById(location);
+      if (!existingLocation) {
+        return errorResponseStatus(400, response, 'Location is not available.', null);
+      }
+
+      request.body.createdBy = userId;
       const event = await eventRepository.createEvent(request.body);
       
       return successResponseStatus(
@@ -191,24 +230,26 @@ const eventController = {
   joinEvent: async (request: Request, response: Response) => {
     try {
       const userId = request.user?._id;
-      // console.log(userId);
       const event = await eventRepository.getEventById(request.params.eventId);
 
-      if (event.status == null) {
-        throw new Error('This event is not existed');
-      } else if (event.status !== 'open') {
-        throw new Error('Event is not open for registration');
+      if (!event) return errorResponseStatus(400, response, 'Event not found.', null);
+
+      if (event.status !== 'open') {
+        return errorResponseStatus(400, response, 'Event is not open for registration.', null);
       }
 
       if (event.participants.includes(userId)) {
-        throw new Error('User already joined the Event.');
+        return errorResponseStatus(400, response, 'User already joined the event.', null);
       }
 
       if (event.participants.length >= event.limit) {
-        throw new Error('Event is full');
+        return errorResponseStatus(400, response, 'Event is full.', null);
       }
 
-      event.participants.push(userId);
+      const user = await userRepository.findById(userId);
+      if (!user) return errorResponseStatus(400, response, 'User not found.', null);
+
+      event.participants.push(user);
 
       if (event.participants.length == event.limit) {
         event.status = 'closed';
@@ -216,15 +257,16 @@ const eventController = {
 
       await event.save();
 
-      const userHistory = await historyRepository.createHistory({
+      const history = await historyRepository.createHistory({
         user: userId,
-        event: request.params.eventId,
+        event: event._id as string,
         action: 'participated',
-      });
+      })
 
-      if (!userHistory) {
-        throw new Error('Failed to create history');
-      }
+      if (!history) return errorResponseStatus(400, response, 'Create history failed.', null);
+
+      user.history.push(history._id);
+      await user.save();
 
       return successResponseStatus(response, 'Join Event Successfully', event);
     } catch (error) {
@@ -237,8 +279,10 @@ const eventController = {
       const userId = request.user?._id;
       const event = await eventRepository.getEventById(request.params.eventId);
 
-      if (!event) {
-        throw new Error('Event not found');
+      if (!event) return errorResponseStatus(400, response, 'Event not found.', null);
+
+      if (event.status !== 'open') {
+        return errorResponseStatus(400, response, 'Exiting the event is not allowed at this moment.', null);
       }
 
       const isParticipant = event.participants.some((participantId) =>
@@ -246,7 +290,7 @@ const eventController = {
       );
 
       if (!isParticipant) {
-        throw new Error('User is not a participant of the Event');
+        return errorResponseStatus(400, response, 'User is not a participant of this event.', null);
       }
 
       event.participants = event.participants.filter(
@@ -255,48 +299,96 @@ const eventController = {
 
       await event.save();
 
-      const userHistory = await historyRepository.getHistoryByUserAndEvent(userId, request.params.eventId);
-      if (!userHistory) {
-        throw new Error('Failed to get history');
-      }
+      const history = await historyRepository.getHistoryByUserAndEvent(userId, request.params.eventId);
+      if (!history) return errorResponseStatus(400, response, 'History not found.', null);
 
-      await historyRepository.updateHistoryOne(userHistory._id, { action: 'exited' });
+      history.action = 'exited';
+      await history.save();
 
-      return successResponseStatus(
-        response,
-        'Successfully exited event',
-        event
-      );
+      return successResponseStatus(response, 'Exit event Successfully', event);
     } catch (error) {
       handleError(response, error);
     }
   },
 
+  cancelEvent: async (request: Request, response: Response) => {
+    try {
+      const eventId = request.params.eventId;
+  
+      const event = await eventRepository.getEventById(eventId);
+      if (!event) {
+        return errorResponseStatus(404, response, 'Event not found.', null);
+      }
+  
+      if (event.status !== 'funding') {
+        return errorResponseStatus(400, response, 'Only events in the funding phase can be canceled.', null);
+      }
+
+      event.status = 'canceled';
+
+      // Map to accumulate refund amounts per user
+      const refundMap = new Map();
+
+      for (const sponsor of event.sponsors) {
+          const userId = sponsor.user._id; // Assuming sponsor.user is an ObjectId
+          const amount = sponsor.amount;
+
+          // Accumulate the refund amount for the user
+          if (refundMap.has(userId)) {
+              refundMap.set(userId, refundMap.get(userId) + amount);
+          } else {
+              refundMap.set(userId, amount);
+          }
+      }
+
+      // Process refunds for each user
+      for (const [userId, totalAmount] of refundMap.entries()) {
+          const user = await userRepository.findById(userId);
+          if (!user) {
+              return errorResponseStatus(400, response, 'User not found.', null);
+          }
+
+          user.coin += totalAmount;
+          event.amountRaised -= totalAmount;
+          await user.save();
+          console.log(`Refunded ${totalAmount} coins to user ${userId}`);
+      }
+
+      await event.save();
+  
+      return successResponseStatus(response, 'Event canceled successfully.', event);
+    } catch (error) {
+      handleError(response, error);
+    }
+  },
+  
   approveEvent: async (request: Request, response: Response) => {
     try {
       const eventId = request.params.eventId;
-      const eventExist = await eventRepository.getEventById(eventId);
+      const event = await eventRepository.getEventById(eventId);
 
-      if (!eventExist) {
-        throw new Error('Event not found');
-      }
+      if (!event) return errorResponseStatus(400, response, 'Event not found.', null);
 
-      const status = eventExist.amountRequired === 0 ? 'open' : 'funding';
-      const event = await eventRepository.updateEventOne(eventId, {
-        status: status,
-      });
+      const status = event.amountRequired === 0 ? 'open' : 'funding';
+      event.status = status;
+      await event.save();
 
-      const userHistory = await historyRepository.createHistory({
-        user: (eventExist.createdBy as unknown as string),
+      const userId = event.createdBy as unknown as string
+      const user = await userRepository.findById(userId);
+      if (!user) return errorResponseStatus(400, response, 'User not found.', null);
+
+      const history = await historyRepository.createHistory({
+        user: userId,
         event: eventId,
         action: 'created',
       })
 
-      if (!userHistory) {
-        throw new Error('Failed to create history');
-      }
+      if (!history) return errorResponseStatus(400, response, 'Create history failed.', null);
+
+      user.history.push(history._id);
+      await user.save();
       
-      return successResponseStatus(response, 'event approved', event);
+      return successResponseStatus(response, 'event approved', event.status);
     } catch (error) {
       handleError(response, error);
     }
@@ -305,27 +397,14 @@ const eventController = {
   rejectEvent: async (request: Request, response: Response) => {
     try {
       const eventId = request.params.eventId;
-      const eventExist = await eventRepository.getEventById(eventId);
+      const event = await eventRepository.getEventById(eventId);
       
-      if (!eventExist) {
-        throw new Error('Event not found');
-      }
-      
-      const event = await eventRepository.updateEventOne(eventId, {
-        status: 'rejected',
-      });
+      if (!event) return errorResponseStatus(400, response, 'Event not found.', null);
 
-      const userHistory = await historyRepository.createHistory({
-        user: (eventExist.createdBy as unknown as string),
-        event: eventId,
-        action: 'cancelled',
-      })
+      event.status = 'rejected';
+      await event.save();
 
-      if (!userHistory) {
-        throw new Error('Failed to create history');
-      }
-
-      return successResponseStatus(response, 'event rejected', event);
+      return successResponseStatus(response, 'event rejected', event.status);
     } catch (error) {
       handleError(response, error);
     }

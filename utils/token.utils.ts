@@ -15,6 +15,7 @@ export const generateTokens = (user: UserType) => {
     role,
     profileImage,
     organization,
+    history,
     createdAt,
     updatedAt,
   } = user;
@@ -31,6 +32,7 @@ export const generateTokens = (user: UserType) => {
     role,
     profileImage,
     organization,
+    history,
     createdAt,
     updatedAt,
   };

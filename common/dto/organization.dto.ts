@@ -4,10 +4,4 @@ export type CreateOrgDto = {
   profileImage: string;
 };
 
-export type UpdateOrgDto = {
-  name: string;
-  description: string;
-  profileImage: string;
-  funding: number;
-  credit: number;
-};
+export type UpdateOrgDto = CreateOrgDto;

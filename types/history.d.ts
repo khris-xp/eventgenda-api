@@ -1,12 +1,12 @@
 import { Document, Types } from 'mongoose';
-import { EventDocument } from './event';
+import { EventType } from './event';
 import { HistoryDocument } from './history';
-import { UserDocument } from './user';
+import { UserType } from './user';
 
 export type HistoryType = {
   _id: mongoose.Schema.ObjectId;
-  event: EventDocument;
-  user: UserDocument;
+  event: EventType;
+  user: UserType;
   action: string
   createdAt: Date;
   updatedAt: Date;

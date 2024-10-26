@@ -47,7 +47,6 @@ const locationController = {
   createLocation: async (request: Request, response: Response) => {
     try {
       const { name, location, prices, thumbnail } = request.body as CreateLocationDto;
-      if (!name || !location || !prices) return errorResponseStatus(400, response, 'Please fill all the fields.', null);
 
       const newLocation = await locationRepository.create({
         name,
@@ -55,6 +54,8 @@ const locationController = {
         prices,
         thumbnail,
       });
+      
+      if (!newLocation) return errorResponseStatus(400, response, 'Create location failed.', null);
       return successResponseStatus(
         response,
         'Create location successfully.',

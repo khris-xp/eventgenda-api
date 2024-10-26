@@ -18,6 +18,7 @@ eventRouter.post('/:id/donate', verifyToken, authorizeRoles("user"), eventContro
 
 eventRouter.post('/:eventId/join', verifyToken, authorizeRoles("user"), eventController.joinEvent);
 eventRouter.post('/:eventId/exit', verifyToken, authorizeRoles("user"), eventController.exitEvent);
+eventRouter.post('/:eventId/cancel', verifyToken, authorizeRoles("admin"), eventController.cancelEvent);
 
 eventRouter.put('/:eventId/approve', verifyToken, authorizeRoles("admin"), eventController.approveEvent);
 eventRouter.put('/:eventId/reject', verifyToken, authorizeRoles("admin"), eventController.rejectEvent);

@@ -8,4 +8,5 @@ export type UpdateUserDto = {
     role: string;
     profileImage: string;
     organization: string;
+    history: string[];
   };

@@ -10,7 +10,7 @@ eventRouter.get('/:id', eventController.getEvent);
 eventRouter.get('/user/:id', eventController.getEventByUser);
 eventRouter.get('/category/:category', eventController.getEventByCategory);
 eventRouter.post('/', verifyToken, authorizeRoles("organizer"), eventController.createEvent);
-eventRouter.put('/:id', verifyToken, authorizeRoles("organizer", "admin"), eventController.updateEvent);
+eventRouter.put('/:id', verifyToken, authorizeRoles("organizer"), eventController.updateEvent);
 eventRouter.delete('/:id', verifyToken, authorizeRoles("organizer", "admin"), eventController.deleteEvent);
 
 eventRouter.post('/:id/funding', verifyToken, authorizeRoles("organizer"), eventController.fundingEvent);

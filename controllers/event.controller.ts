@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { CreateEventDto, fundingEventDto } from '../common/dto/event.dto';
+import { CreateEventDto, FundingEventDto, UpdateEventDto } from '../common/dto/event.dto';
 import eventRepository from '../repositories/event.repository';
 import sponsorRepository from '../repositories/sponsor.repository';
 import userRepository from '../repositories/user.repository';
@@ -16,7 +16,7 @@ const processEventFunding = async (
 ) => {
   try {
     const userId = request.user?._id;
-    const { amount } = request.body as fundingEventDto;
+    const { amount } = request.body as FundingEventDto;
     const event = await eventRepository.getEventById(request.params.id);
     const createdBy = event.createdBy as unknown as string;
 
@@ -46,17 +46,23 @@ const processEventFunding = async (
       return errorResponseStatus(400, response, 'Not enough coin.', null);
     }
 
-    // Create a new sponsor and add it to the event
-    const sponsor = await sponsorRepository.createSponsor({
-      user: userId,
-      event: request.params.id,
-      amount: amount,
-      type: type,
-    });
-
-    if (!sponsor) return errorResponseStatus(400, response, 'Failed to create sponsor.', null);
-    event.sponsors.push(sponsor._id);
-
+    // create sponsor
+    let sponsor;
+    const sponsorExist = await sponsorRepository.getSponsorByUserAndEvent(userId, request.params.id);
+    if (sponsorExist) {
+      sponsorExist.amount += amount;
+      sponsor = await sponsorExist.save();
+    } else {
+      sponsor = await sponsorRepository.createSponsor({
+        user: userId,
+        event: request.params.id,
+        amount: amount,
+        type: type,
+      });
+      
+      event.sponsors.push(sponsor);
+    }
+    
     // Update the event's raised amount
     const newAmount = event.amountRaised + amount;
     event.amountRaised = newAmount;
@@ -93,6 +99,53 @@ const eventController = {
   getEvents: async (request: Request, response: Response) => {
     try {
       const events = await eventRepository.getAllEvents();
+      
+      // change the event status
+      for (const event of events) {
+        if (event.eventEndDate < new Date() && event.status === 'open') {
+          event.status = 'closed';
+          const organizer = await userRepository.findById(event.createdBy as unknown as string);
+          const organization = await organizationRepository.getById(organizer.organization as string);
+          organization.credit += (event.participants.length / event.limit) * 100;
+          await organization.save();
+          await event.save();
+        }
+
+        if (event.registrationEndDate < new Date() && event.amountRaised < event.amountRequired) {
+          event.status = 'canceled';
+
+          // Map to accumulate refund amounts per user
+          const refundMap = new Map();
+
+          for (const sponsor of event.sponsors) {
+              const userId = sponsor.user._id;
+              const amount = sponsor.amount;
+
+              // Accumulate the refund amount for the user
+              if (refundMap.has(userId)) {
+                  refundMap.set(userId, refundMap.get(userId) + amount);
+              } else {
+                  refundMap.set(userId, amount);
+              }
+          }
+
+          // Process refunds for each user
+          for (const [userId, totalAmount] of refundMap.entries()) {
+              const user = await userRepository.findById(userId);
+              if (!user) {
+                  return errorResponseStatus(400, response, 'User not found.', null);
+              }
+
+              user.coin += totalAmount;
+              event.amountRaised -= totalAmount;
+              await user.save();
+              console.log(`Refunded ${totalAmount} coins to user ${userId}`);
+          }
+
+          await event.save();
+        }
+      }
+
       return successResponseStatus(
         response,
         'Get all events successfully.',
@@ -192,10 +245,44 @@ const eventController = {
 
   updateEvent: async (request: Request, response: Response) => {
     try {
+      const userId = request.user?._id;
+      const { title, location, eventStartDate, eventEndDate, registrationStartDate, registrationEndDate } = request.body as UpdateEventDto;
+
+      // validate date
+      if (eventStartDate >= eventEndDate) {
+        return errorResponseStatus(400, response, 'Event start date must be before event end date.', null);
+      }
+
+      if (registrationStartDate >= registrationEndDate) {
+        return errorResponseStatus(400, response, 'Registration start date must be before registration end date.', null);
+      }
+
+      if (registrationStartDate >= eventStartDate) {
+        return errorResponseStatus(400, response, 'Registration start date must be before event start date.', null);
+      }
+
+      if (registrationEndDate >= eventEndDate) {
+        return errorResponseStatus(400, response, 'Registration end date must be before event end date.', null);
+      }
+
+      // validate title
+      const existingEvent = await eventRepository.getEventByTitle(title);
+      if (existingEvent.length > 0) {
+        return errorResponseStatus(400, response, 'Event title already exists.', null);
+      }
+
+      // validate location
+      const existingLocation = await locationRepository.getById(location);
+      if (!existingLocation) {
+        return errorResponseStatus(400, response, 'Location is not available.', null);
+      }
+
+      request.body.createdBy = userId;
       const event = await eventRepository.updateEvent(
         request.params.id,
         request.body
       );
+
       return successResponseStatus(
         response,
         'Update event successfully.',
@@ -319,10 +406,6 @@ const eventController = {
       if (!event) {
         return errorResponseStatus(404, response, 'Event not found.', null);
       }
-  
-      if (event.status !== 'funding') {
-        return errorResponseStatus(400, response, 'Only events in the funding phase can be canceled.', null);
-      }
 
       event.status = 'canceled';
 
@@ -330,7 +413,7 @@ const eventController = {
       const refundMap = new Map();
 
       for (const sponsor of event.sponsors) {
-          const userId = sponsor.user._id; // Assuming sponsor.user is an ObjectId
+          const userId = sponsor.user._id;
           const amount = sponsor.amount;
 
           // Accumulate the refund amount for the user

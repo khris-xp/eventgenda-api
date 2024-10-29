@@ -28,6 +28,10 @@ class SponsorRepository extends BaseRepository<SponsorDocument> {
     return await this.model.find({ event: eventId }).exec();
   }
 
+  async getSponsorByUserAndEvent(userId: string, eventId: string): Promise<SponsorDocument> {
+    return await this.model.findOne({ user: userId, event: eventId }).exec();
+  }
+
   async createSponsor(create: CreateSponsorDto): Promise<SponsorDocument> {
     const newSponsor = new this.model(create);
     return await newSponsor.save();

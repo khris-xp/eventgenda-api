@@ -1,4 +1,4 @@
-import { CreateEventDto } from '../common/dto/event.dto';
+import { CreateEventDto, UpdateEventDto } from '../common/dto/event.dto';
 import eventModel from '../models/event.model';
 import { EventDocument } from '../types/event';
 import BaseRepository from './entity.repository';
@@ -94,7 +94,7 @@ class EventRepository extends BaseRepository<EventDocument> {
 
   async updateEvent(
     id: string,
-    updates: CreateEventDto
+    updates: UpdateEventDto
   ): Promise<EventDocument> {
     const event = await this.model
       .findByIdAndUpdate(id, updates, { new: true })

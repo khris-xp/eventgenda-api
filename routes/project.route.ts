@@ -5,7 +5,7 @@ import authorizeRoles from '../middlewares/role.middleware';
 
 const projectRouter = Router();
 
-projectRouter.post('/create', verifyToken, authorizeRoles("user"), projectController.createProject);
+projectRouter.post('/:eventId/create', verifyToken, authorizeRoles("user"), projectController.createProject);
 projectRouter.get('/', projectController.getAllProjects);
 projectRouter.get('/:id', projectController.getProjectById);
 projectRouter.put('/:id', verifyToken, authorizeRoles("user"), projectController.updateProject);

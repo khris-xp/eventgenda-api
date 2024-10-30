@@ -1,26 +1,38 @@
 import { Request, Response } from 'express';
 import Project from '../models/project.model';
 import { handleError } from '../utils/error.utils';
+import {
+  errorResponseStatus,
+  successResponseStatus,
+} from '../utils/response.utils';
+import projectRepository from '../repositories/project.repositories';
+import eventRepository from '../repositories/event.repository';
 
 const projectController = {
   createProject: async (req: Request, res: Response) => {
     try {
       const createdBy = req.user?._id;
-      const { name, description, link, demo, event } = req.body;
+      const eventId = req.params.eventId;
 
-      const newProject = new Project({
-        name,
-        description,
-        link,
-        demo,
-        event,
+      const project = await projectRepository.createProject({
+        ...req.body,
         createdBy,
+        event: eventId,
       });
 
-      await newProject.save();
-      return res
-        .status(201)
-        .json({ message: 'Project created successfully', project: newProject });
+      if (!project) {
+        return errorResponseStatus(400, res, "Create project failed", null);
+      }
+
+      const event = await eventRepository.getEventById(eventId);
+      if (!event) {
+        return errorResponseStatus(404, res, "Event not found", null);
+      }
+
+      event.projects.push(project._id);
+      await event.save();
+
+      return successResponseStatus(res, "Project created successfully", project);
     } catch (error) {
       handleError(res, error);
     }
@@ -28,8 +40,8 @@ const projectController = {
 
   getAllProjects: async (req: Request, res: Response) => {
     try {
-      const projects = await Project.find().populate('event');
-      return res.status(200).json(projects);
+      const projects = await projectRepository.findAllProjects();
+      return successResponseStatus(res, "Projects retrieved successfully", projects);
     } catch (error) {
       handleError(res, error);
     }
@@ -37,14 +49,13 @@ const projectController = {
 
   getProjectById: async (req: Request, res: Response) => {
     try {
-      const { id } = req.params;
-      const project = await Project.findById(id).populate('event');
+      const project = await projectRepository.findProjectById(req.params.id);
 
       if (!project) {
-        return res.status(404).json({ message: 'Project not found' });
+        return errorResponseStatus(404, res, "Project not found", null);
       }
 
-      return res.status(200).json(project);
+      return successResponseStatus(res, "Project retrieved successfully", project);
     } catch (error) {
       handleError(res, error);
     }
@@ -52,20 +63,12 @@ const projectController = {
 
   updateProject: async (req: Request, res: Response) => {
     try {
-      const { id } = req.params;
-      const updatedData = req.body;
-
-      const project = await Project.findByIdAndUpdate(id, updatedData, {
-        new: true,
-      });
-
+      const project = await projectRepository.updateProject(req.params.id, req.body);
       if (!project) {
-        return res.status(404).json({ message: 'Project not found' });
+        return errorResponseStatus(404, res, "Project not found", null);
       }
 
-      return res
-        .status(200)
-        .json({ message: 'Project updated successfully', project });
+      return successResponseStatus(res, "Project updated successfully", project);
     } catch (error) {
       handleError(res, error);
     }
@@ -73,14 +76,12 @@ const projectController = {
 
   deleteProject: async (req: Request, res: Response) => {
     try {
-      const { id } = req.params;
-      const project = await Project.findByIdAndDelete(id);
-
+      const project = await projectRepository.deleteProject(req.params.id);
       if (!project) {
-        return res.status(404).json({ message: 'Project not found' });
+        return errorResponseStatus(404, res, "Project not found", null);
       }
 
-      return res.status(200).json({ message: 'Project deleted successfully' });
+      return successResponseStatus(res, "Project deleted successfully", null);
     } catch (error) {
       handleError(res, error);
     }

@@ -8,6 +8,17 @@ const userRouter: Router = express.Router();
 userRouter.post('/register', userController.register);
 userRouter.post('/login', userController.login);
 userRouter.post('/refresh-token', userController.refreshToken);
-userRouter.get('/profile', verifyToken, authorizeRoles("user", "organizer", "admin"), userController.getUserProfile);
+userRouter.get(
+  '/profile',
+  verifyToken,
+  authorizeRoles('user', 'organizer', 'admin'),
+  userController.getUserProfile
+);
+userRouter.put(
+  '/profile',
+  verifyToken,
+  authorizeRoles('user', 'organizer', 'admin'),
+  userController.updateUserProfile
+);
 
 export default userRouter;

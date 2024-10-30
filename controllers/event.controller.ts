@@ -118,8 +118,7 @@ const processEventFunding = async (
 
     // update coin and reward to user
     user.coin -= amount;
-    const reward = amount * 0.1;
-    user.reward += reward;
+    user.rewardPoints += amount * 0.1;
     await user.save();
 
     return successResponseStatus(

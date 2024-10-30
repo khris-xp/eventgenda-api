@@ -17,6 +17,9 @@ rewardRouter.get('/:id', rewardController.getRewardById);
 // Create a new reward (admin only)
 rewardRouter.post('/', verifyToken, authorizeRoles("admin"), rewardController.createReward);
 
+// Add a reward to a user (authenticated users only)
+rewardRouter.post('/:eventId/add', verifyToken, authorizeRoles("user", "organizer"), rewardController.addRewardToUser);
+
 // Update a reward (admin only)
 rewardRouter.put('/:id', verifyToken, authorizeRoles("admin"), rewardController.updateReward);
 

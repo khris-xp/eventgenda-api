@@ -4,6 +4,7 @@ export interface CreateProjectDto {
   link: string;
   demo: string;
   event: string;
+  createdBy: string;
 }
 
 export interface UpdateProjectDto {
@@ -12,4 +13,5 @@ export interface UpdateProjectDto {
   link?: string;
   demo?: string;
   event?: string;
+  createdBy: string;
 }

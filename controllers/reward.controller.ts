@@ -3,6 +3,7 @@ import { RewardRepository } from '../repositories/reward.repository';
 import { CreateRewardDto, UpdateRewardDto } from '../common/dto/reward.dto';
 import { handleError } from '../utils/error.utils';
 import { successResponseStatus, errorResponseStatus } from '../utils/response.utils';
+import UserRepository from '../repositories/user.repository';
 export class RewardController {
     private rewardRepository: RewardRepository;
 
@@ -28,7 +29,6 @@ export class RewardController {
         return handleError(res, error);
       }
     }
-  
 
     getRewardById = async (req: Request, res: Response) => {
         try {
@@ -40,6 +40,27 @@ export class RewardController {
         return successResponseStatus(res, 'Reward retrieved successfully', reward);
         } catch (error) {
         return handleError(res, error);
+        }
+    }
+
+    addRewardToUser = async (req: Request, res: Response) => {
+        try {
+          const userId = req.user?._id;
+          const rewardId = req.params.eventId;
+
+          const user = await UserRepository.findById(userId);
+          const reward = await this.rewardRepository.findById(rewardId);
+          if (!reward) {
+            return errorResponseStatus(404, res, 'Reward not found', null);
+          }
+
+          user.redeemedRewards.push(reward);
+          user.rewardPoints -= reward.price;
+          await user.save();
+
+          return successResponseStatus(res, 'Reward added to user successfully', user);
+        } catch (error) {
+          return handleError(res, error);
         }
     }
 

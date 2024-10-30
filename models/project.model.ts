@@ -3,7 +3,7 @@ import { ProjectDocument } from '../types/project';
 const projectSchema = new Schema<ProjectDocument>(
   {
     name: { type: String, required: true },
-    description: { type: String, required: true },
+    description: { type: String },
     link: { type: String, required: true },
     demo: { type: String, required: true },
     event: { type: Schema.Types.ObjectId, ref: 'Event', required: true },

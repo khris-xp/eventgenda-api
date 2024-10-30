@@ -6,7 +6,10 @@ class UserRepository {
     if (!userId) throw new Error('User does not exist.');
     const user = await User.findById(userId)
       .populate('organization')
-      .populate('history')
+      .populate({
+        path: 'history',
+        populate: [{ path: 'event' }, { path: 'user' }],
+      })
       .select('-password');
     if (!user) throw new Error('User does not exist.');
     return user;

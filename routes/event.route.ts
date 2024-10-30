@@ -6,21 +6,71 @@ import authorizeRoles from '../middlewares/role.middleware';
 const eventRouter: Router = express.Router();
 
 eventRouter.get('/', eventController.getEvents);
+eventRouter.get('/user', verifyToken, eventController.getEventByUser);
 eventRouter.get('/:id', eventController.getEvent);
-eventRouter.get('/user/:id', eventController.getEventByUser);
 eventRouter.get('/category/:category', eventController.getEventByCategory);
-eventRouter.post('/', verifyToken, authorizeRoles("organizer"), eventController.createEvent);
-eventRouter.put('/:id', verifyToken, authorizeRoles("organizer"), eventController.updateEvent);
-eventRouter.delete('/:id', verifyToken, authorizeRoles("organizer", "admin"), eventController.deleteEvent);
+eventRouter.post(
+  '/',
+  verifyToken,
+  authorizeRoles('organizer'),
+  eventController.createEvent
+);
+eventRouter.put(
+  '/:id',
+  verifyToken,
+  authorizeRoles('organizer'),
+  eventController.updateEvent
+);
+eventRouter.delete(
+  '/:id',
+  verifyToken,
+  authorizeRoles('organizer', 'admin'),
+  eventController.deleteEvent
+);
 
-eventRouter.post('/:id/funding', verifyToken, authorizeRoles("organizer"), eventController.fundingEvent);
-eventRouter.post('/:id/donate', verifyToken, authorizeRoles("user"), eventController.donateEvent);
+eventRouter.post(
+  '/:id/funding',
+  verifyToken,
+  authorizeRoles('organizer'),
+  eventController.fundingEvent
+);
+eventRouter.post(
+  '/:id/donate',
+  verifyToken,
+  authorizeRoles('user'),
+  eventController.donateEvent
+);
 
-eventRouter.post('/:eventId/join', verifyToken, authorizeRoles("user"), eventController.joinEvent);
-eventRouter.post('/:eventId/exit', verifyToken, authorizeRoles("user"), eventController.exitEvent);
-eventRouter.post('/:eventId/cancel', verifyToken, authorizeRoles("admin"), eventController.cancelEvent);
+eventRouter.post(
+  '/:eventId/join',
+  verifyToken,
+  authorizeRoles('user'),
+  eventController.joinEvent
+);
+eventRouter.post(
+  '/:eventId/exit',
+  verifyToken,
+  authorizeRoles('user'),
+  eventController.exitEvent
+);
+eventRouter.post(
+  '/:eventId/cancel',
+  verifyToken,
+  authorizeRoles('admin'),
+  eventController.cancelEvent
+);
 
-eventRouter.put('/:eventId/approve', verifyToken, authorizeRoles("admin"), eventController.approveEvent);
-eventRouter.put('/:eventId/reject', verifyToken, authorizeRoles("admin"), eventController.rejectEvent);
+eventRouter.put(
+  '/:eventId/approve',
+  verifyToken,
+  authorizeRoles('admin'),
+  eventController.approveEvent
+);
+eventRouter.put(
+  '/:eventId/reject',
+  verifyToken,
+  authorizeRoles('admin'),
+  eventController.rejectEvent
+);
 
 export default eventRouter;

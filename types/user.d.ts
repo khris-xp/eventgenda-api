@@ -11,11 +11,12 @@ export type UserType = {
   userName: string;
   age: number;
   coin: number;
-  reward: number;
+  rewardPoints: number;
   role: string;
   profileImage: string;
   organization: OrganizationType;
   history: HistoryType[];
+  redeemedRewards: RewardType[];
   createdAt: Date;
   updatedAt: Date;
 };

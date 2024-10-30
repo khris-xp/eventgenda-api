@@ -5,8 +5,10 @@ export interface RewardType {
   description: string;
   price: number;
   image: string;
+  content: string;
+  category: string;
   createdDate: Date;
   updatedDate: Date;
 }
 
-export interface RewardDocument extends RewardType, Document {}
+export type RewardDocument = RewardType & Document;

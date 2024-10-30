@@ -11,7 +11,7 @@ const userSchema = new Schema<UserType>(
     userName: { type: String, required: true },
     age: { type: Number, required: true },
     coin: { type: Number, default: 0 },
-    reward: { type: Number, default: 0 },
+    rewardPoints: { type: Number, default: 0 },
     role: {
       type: String,
       default: 'user',
@@ -20,6 +20,7 @@ const userSchema = new Schema<UserType>(
     profileImage: { type: String, default: 'https://shorturl.at/CQtT2' },
     organization: { type: Schema.Types.ObjectId, ref: 'Organization' },
     history: [{ type: Schema.Types.ObjectId, ref: 'History' }],
+    redeemedRewards: [{ type: Schema.Types.ObjectId, ref: 'Reward' }],
   },
   {
     timestamps: true,

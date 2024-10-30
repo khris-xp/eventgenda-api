@@ -4,9 +4,10 @@ export type UpdateUserDto = {
     userName: string;
     age: number;
     coin: number;
-    reward: number;
+    rewardPoints: number;
     role: string;
     profileImage: string;
     organization: string;
     history: string[];
+    redeemedRewards: string[];
   };

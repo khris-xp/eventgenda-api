@@ -10,6 +10,7 @@ class UserRepository {
         path: 'history',
         populate: [{ path: 'event' }, { path: 'user' }],
       })
+      .populate('redeemedRewards')
       .select('-password');
     if (!user) throw new Error('User does not exist.');
     return user;

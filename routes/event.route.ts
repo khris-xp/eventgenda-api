@@ -56,7 +56,7 @@ eventRouter.post(
 eventRouter.post(
   '/:eventId/cancel',
   verifyToken,
-  authorizeRoles('admin'),
+  authorizeRoles('organizer', 'admin'),
   eventController.cancelEvent
 );
 

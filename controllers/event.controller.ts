@@ -378,18 +378,7 @@ const eventController = {
           null
         );
       }
-
-      // validate title
-      const existingEvent = await eventRepository.getEventByTitle(title);
-      if (existingEvent.length > 0) {
-        return errorResponseStatus(
-          400,
-          response,
-          'Event title already exists.',
-          null
-        );
-      }
-
+      
       // validate location
       const existingLocation = await locationRepository.getById(location);
       if (!existingLocation) {

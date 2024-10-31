@@ -19,7 +19,13 @@ class EventRepository extends BaseRepository<EventDocument> {
         },
       })
       .populate('participants')
-      .populate('sponsors')
+      .populate({
+        path: 'sponsors',
+        populate: {
+          path: 'user',
+          select: '-password',
+        },
+      })
       .populate('rules')
       .populate('projects')
       .populate('location')
@@ -37,7 +43,13 @@ class EventRepository extends BaseRepository<EventDocument> {
         },
       })
       .populate('participants')
-      .populate('sponsors')
+      .populate({
+        path: 'sponsors',
+        populate: {
+          path: 'user',
+          select: '-password',
+        },
+      })
       .populate('rules')
       .populate('projects')
       .populate('location')
@@ -54,7 +66,13 @@ class EventRepository extends BaseRepository<EventDocument> {
       .populate('categories')
       .populate('createdBy')
       .populate('participants')
-      .populate('sponsors')
+      .populate({
+        path: 'sponsors',
+        populate: {
+          path: 'user',
+          select: '-password',
+        },
+      })
       .populate('rules')
       .populate('projects')
       .populate('location')
@@ -67,7 +85,13 @@ class EventRepository extends BaseRepository<EventDocument> {
       .populate('categories')
       .populate('createdBy')
       .populate('participants')
-      .populate('sponsors')
+      .populate({
+        path: 'sponsors',
+        populate: {
+          path: 'user',
+          select: '-password',
+        },
+      })
       .populate('rules')
       .populate('projects')
       .populate('location')
@@ -80,7 +104,13 @@ class EventRepository extends BaseRepository<EventDocument> {
       .populate('categories')
       .populate('createdBy')
       .populate('participants')
-      .populate('sponsors')
+      .populate({
+        path: 'sponsors',
+        populate: {
+          path: 'user',
+          select: '-password',
+        },
+      })
       .populate('rules')
       .populate('projects')
       .populate('location')

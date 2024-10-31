@@ -7,7 +7,7 @@ class BaseRepository<T extends Document> {
   constructor(model: Model<T>) {
     this.model = model;
   }
-  
+
   async getAll() {
     return await this.model.find();
   }

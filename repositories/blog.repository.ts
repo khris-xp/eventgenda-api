@@ -7,9 +7,9 @@ class BlogRepository extends BaseRepository<BlogDocument> {
   constructor() {
     super(blogModel);
   }
-  
+
   async getAllBlogs(): Promise<BlogDocument[]> {
-    return await this.model.find().exec();
+    return await this.model.find().populate('author').exec();
   }
 
   async getBlogById(id: string): Promise<BlogDocument> {
@@ -53,5 +53,4 @@ class BlogRepository extends BaseRepository<BlogDocument> {
     await this.model.findByIdAndDelete(id).exec();
   }
 }
-
 export default new BlogRepository();

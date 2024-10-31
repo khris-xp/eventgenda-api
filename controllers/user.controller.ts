@@ -115,9 +115,37 @@ const authController = {
     try {
       const userId = request.user?._id;
       const user = await userRepository.findById(userId);
+      if (!user) {
+        return response.status(400).json({ message: 'User does not exist.' });
+      }
+
       return successResponseStatus(
         response,
         'Get user profile successfully.',
+        user
+      );
+    } catch (error) {
+      handleError(response, error);
+    }
+  },
+  updateUserProfile: async (request: Request, response: Response) => {
+    try {
+      const userId = request.user?._id;
+      const { fullName, userName, email, age } =
+        request.body as RegisterUserDto;
+
+      await userRepository.updateOne(userId, {
+        fullName,
+        userName,
+        email,
+        age,
+      });
+
+      const user = await userRepository.findById(userId);
+
+      return successResponseStatus(
+        response,
+        'Update user profile successfully.',
         user
       );
     } catch (error) {

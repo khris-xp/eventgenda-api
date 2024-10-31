@@ -1,6 +1,4 @@
 
 npm run build || (echo "⛔ Build Failed" && exit 1)
 
-git add .
-
 echo "✅ Format, Lint, Build Passed"

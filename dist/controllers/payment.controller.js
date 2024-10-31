@@ -12,10 +12,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const stripe_1 = __importDefault(require("stripe"));
 const payment_repository_1 = __importDefault(require("../repositories/payment.repository"));
 const user_repository_1 = __importDefault(require("../repositories/user.repository"));
 const error_utils_1 = require("../utils/error.utils");
 const response_utils_1 = require("../utils/response.utils");
+const stripe = new stripe_1.default(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: '2024-04-10',
+});
 const paymentController = {
     findAll(req, res) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -32,7 +36,6 @@ const paymentController = {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
             try {
-                const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
                 const { total, status } = req.body;
                 const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a._id;
                 const paymentData = {

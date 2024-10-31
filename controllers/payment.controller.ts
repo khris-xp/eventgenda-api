@@ -1,5 +1,4 @@
 import { Request, Response } from 'express';
-import Stripe from 'stripe';
 import PaymentRepository from '../repositories/payment.repository';
 import userRepository from '../repositories/user.repository';
 import { handleError } from '../utils/error.utils';
@@ -7,9 +6,6 @@ import {
   errorResponseStatus,
   successResponseStatus,
 } from '../utils/response.utils';
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-  apiVersion: '2024-04-10',
-});
 
 const paymentController = {
   async findAll(req: Request, res: Response) {
@@ -27,6 +23,7 @@ const paymentController = {
 
   async create(req: Request, res: Response) {
     try {
+      const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
       const { total, status } = req.body;
       const userId = req.user?._id;
 

@@ -21,8 +21,8 @@ const payment_route_1 = __importDefault(require("../routes/payment.route"));
 const project_route_1 = __importDefault(require("../routes/project.route"));
 const reward_route_1 = __importDefault(require("../routes/reward.route"));
 const sponsor_route_1 = __importDefault(require("../routes/sponsor.route"));
-const user_route_1 = __importDefault(require("../routes/user.route"));
 const upload_route_1 = __importDefault(require("../routes/upload.route"));
+const user_route_1 = __importDefault(require("../routes/user.route"));
 dotenv_1.default.config();
 const app = (0, express_1.default)();
 const port = (_a = process.env.PORT) !== null && _a !== void 0 ? _a : 8081;
@@ -30,7 +30,11 @@ const URL = process.env.MONGODB_URI;
 app.use(express_1.default.json());
 app.use(express_1.default.urlencoded({ extended: true }));
 app.use((0, cookie_parser_1.default)());
-app.use((0, cors_1.default)());
+app.use((0, cors_1.default)({
+    origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+}));
 app.use((0, express_fileupload_1.default)({
     useTempFiles: true,
     tempFileDir: '/tmp/',

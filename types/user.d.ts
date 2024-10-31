@@ -2,6 +2,7 @@ import { Document, Types } from 'mongoose';
 import { HistoryType } from './history';
 import { OrganizationType } from './organization';
 import { RewardType } from './reward';
+import { SponsorType } from './sponsor';
 
 export type UserType = {
   _id: mongoose.Schema.Types.ObjectId;
